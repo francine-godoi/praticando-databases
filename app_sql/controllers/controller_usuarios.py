@@ -11,7 +11,8 @@ class ControllerUsuario:
     def validar_credenciais(self, username, senha): 
 
         load_dotenv()
-        PEPPER = getenv("PEPPER")        
+        PEPPER = getenv("PEPPER")  
+        print(PEPPER)      
         
         info_usuario = self.repo_usuario.selecionar_usuario_por_username(username)
         
