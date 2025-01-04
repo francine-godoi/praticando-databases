@@ -74,3 +74,10 @@ Futuramente, considero a possibilidade de criar uma terceira versão do sistema 
 ## 🔀 Diagrama ER
 
 ![diagrama_er_sistema_login_lista_tarefas](https://github.com/user-attachments/assets/930f88e0-8241-4d56-bac0-bded6c9c6ea0)
+
+----
+
+## Referencias
+
+[Storing and Retrieving Passwords Securely in Python
+By Gurpreet Kaur](https://www.askpython.com/python/examples/storing-retrieving-passwords-securely)
