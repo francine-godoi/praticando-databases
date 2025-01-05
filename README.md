@@ -36,8 +36,11 @@ Futuramente, considero a possibilidade de criar uma terceira versão do sistema 
 ### Tela inicial
 
 - <ins>Cadastrar novo usuário:</ins> Usuario, Senha.
-  <br>**Restrições:** Campo usuário deve ser único; Senha deve ser criptografada;
-- <ins>Login</ins>
+  <br>**Restrições:**
+    - Campo usuário deve ser único;
+    - Senha deve ter pelo menos 8 caracteres, incluindo: letras maiúsculas, minúsculas, números e caracteres especiais;
+  
+- <ins>Fazer Login:</ins> Leva o usuário ao sistema de lista de tarefas.
 - <ins>Sair do sistema</ins>
 
 
@@ -47,7 +50,7 @@ Futuramente, considero a possibilidade de criar uma terceira versão do sistema 
 - <ins>Adicionar tarefa:</ins> Descrição, Importância (Alta/Média/Baixa).
   <br>O sistema adiciona automaticamente a data de criação e status "Em andamento";
   
-- <ins>Editar tarefa:</ins> Descrição, Importância.
+- <ins>Editar tarefa:</ins> Descrição, Importância. A escolha da tarefa é feita por código.
   <br>**Restrição:** Alteração é permitida apenas para tarefas com status "Em andamento";
   
 - <ins>Excluir tarefa:</ins> A escolha da tarefa é feita por código.
@@ -63,9 +66,12 @@ Futuramente, considero a possibilidade de criar uma terceira versão do sistema 
   - Em andamento
   - Finalizadas
   - Por data
-    - data criação 
-    - data finalização
+    - Data criação 
+    - Data finalização
   - Por importância
+    - Alta
+    - Média
+    - Baixa
     
 - <ins>Sair/Logout:</ins> Finaliza a sessão do usuáiro e volta para a tela inicial
 
@@ -86,4 +92,8 @@ By Gurpreet Kaur](https://www.askpython.com/python/examples/storing-retrieving-p
 
 ## 🛠️ Requerimentos
 
-`pip install python-dotenv`
+    `pip install python-dotenv`
+
+Criar um arquivo .env e armazenar a variável "PEPPER" que será usada no hash das senhas durante o cadastro do usuário.
+
+      PEPPER = "SECRET_KEY"
