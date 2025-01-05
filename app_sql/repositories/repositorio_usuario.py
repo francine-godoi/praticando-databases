@@ -32,9 +32,10 @@ class RepositorioUsuario(AuxiliarDB):
         try:
             self.executar_sql(sql, info_usuario, comitar=True)
             self.fechar_conexao()
+            return True
         except IntegrityError:
             self.fechar_conexao()
-            raise IntegrityError
+            return False
 
 
     def deletar_usuario(self, usuairo_id: int) -> None:

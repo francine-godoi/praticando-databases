@@ -30,14 +30,14 @@ class ControllerUsuarios:
         salt = self.gerar_salt()
         hashed_senha = self.hash_senha(salt, senha)
         user = Usuario(username, hashed_senha, salt)
-        try:
-            self.repo_usuario.cadastrar_usuario(user)
-        except IntegrityError:
-            print("Username já existe.\n")
-            return self.cadastrar_usuario()
+        
+        cadastrado = self.repo_usuario.cadastrar_usuario(user)
+        if cadastrado:
+            print("Cadastrado com sucesso.\n")                        
         else:
-            print("Cadastrado com sucesso.\n")            
-
+            print("Username já existe.\n")
+            return self.cadastrar_usuario()     
+        
 
     def validar_credenciais(self) -> int:
         
