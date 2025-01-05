@@ -1,7 +1,6 @@
 from models.usuarios import Usuario
 from repositories.repositorio_usuario import RepositorioUsuario
 
-from sqlite3 import IntegrityError
 from hashlib import sha256
 from os import getenv, urandom
 import re
@@ -36,10 +35,10 @@ class ControllerUsuarios:
             print("Cadastrado com sucesso.\n")                        
         else:
             print("Username já existe.\n")
-            return self.cadastrar_usuario()     
-        
+            return self.cadastrar_usuario()           
 
-    def validar_credenciais(self) -> int:
+
+    def validar_credenciais(self) -> tuple | bool:
         
         username = input("\nUsuário: ").strip()
         senha = input("Senha: ").strip()
@@ -69,10 +68,10 @@ class ControllerUsuarios:
         (?=.*[a-z])           // deve conter ao menos uma letra minúscula
         (?=.*[A-Z])           // deve conter ao menos uma letra maiúscula
         (?=.*[$&@#])          // deve conter ao menos um caractere especial
-        [\w $&@#]{8,}         // deve conter ao menos 8 dos caracteres mencionados
+        [a-zA-Z0-9$&@#]{8,}   // deve conter ao menos 8 caracteres 
         $
         """
-        senha_forte = r"^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[$&@#])[\w $&@#]{8,}$"       
+        senha_forte = r"^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[$&@#])[a-zA-Z0-9$&@#]{8,}$"       
         return bool(re.match(senha_forte, senha))
     
     

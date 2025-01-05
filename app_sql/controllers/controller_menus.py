@@ -6,11 +6,11 @@ from views.tela_tarefas import TelaTarefas
 class ControllerMenus:
 
     def __init__(self):
-        self.ctrl_usuario = ControllerUsuarios()
-        self.ctrl_tarefa = ControllerTarefas()
         self.tela_inicial = TelaInicial()
         self.tela_tarefas = TelaTarefas()
-        self.usuario_logado = False        
+        self.ctrl_usuario = ControllerUsuarios()
+        self.ctrl_tarefa = None
+        self.usuario_logado = False
 
 
     def mostrar_menu_inicial(self) -> None:
@@ -18,7 +18,7 @@ class ControllerMenus:
 
 
     def mostrar_menu_tarefas(self) -> None:        
-        self.tela_tarefas.mostrar_menu_tarefas(self.usuario_logado[1])
+        self.tela_tarefas.mostrar_menu_tarefas(self.usuario_logado)
 
 
     def tratar_opcao_menu_inicial(self, escolha: str) -> None:
@@ -29,7 +29,8 @@ class ControllerMenus:
             case "2":
                 usuario_logado = self.ctrl_usuario.validar_credenciais()                
                 if usuario_logado:                    
-                    self.usuario_logado = usuario_logado 
+                    self.usuario_logado = usuario_logado[1] # username
+                    self.ctrl_tarefa = ControllerTarefas(usuario_logado[0]) # id_usuario
             case "3":
                 print("Tchau!!")
                 exit()
@@ -40,13 +41,13 @@ class ControllerMenus:
     def tratar_opcao_menu_tarefas(self, escolha: str) -> None:
         match escolha:
             case "1":
-                self.ctrl_tarefa.adicionar_tarefa(self.usuario_logado)
+                self.ctrl_tarefa.adicionar_tarefa()
             case "2":
-                self.ctrl_tarefa.editar_tarefa(self.usuario_logado)
+                self.ctrl_tarefa.editar_tarefa()
             case "3":
-                self.ctrl_tarefa.excluir_tarefa(self.usuario_logado)
+                self.ctrl_tarefa.excluir_tarefa()
             case "4":
-                self.ctrl_tarefa.finalizar_tarefa(self.usuario_logado)
+                self.ctrl_tarefa.finalizar_tarefa()
             case "5":
                 self.tratar_opcao_submenu_listar_tarefas()
             case "6":
@@ -62,15 +63,15 @@ class ControllerMenus:
 
         match escolha:
             case "1":
-                self.ctrl_tarefa.listar_todas_tarefas(self.usuario_logado)
+                self.ctrl_tarefa.listar_todas_tarefas()
             case "2":
-                self.ctrl_tarefa.listar_tarefas_andamento(self.usuario_logado)
+                self.ctrl_tarefa.listar_tarefas_andamento()
             case "3":
-                self.ctrl_tarefa.listar_tarefas_finalizadas(self.usuario_logado)
+                self.ctrl_tarefa.listar_tarefas_finalizadas()
             case "4":
                 self.tratar_opcao_submenu_listar_por_data()
             case "5":
-                self.ctrl_tarefa.listar_tarefas_por_importancia(self.usuario_logado)
+                self.ctrl_tarefa.listar_tarefas_por_importancia()
             case "6":                
                 self.main()
             case _:
@@ -84,9 +85,9 @@ class ControllerMenus:
 
         match escolha:
             case "1":
-                self.ctrl_tarefa.listar_tarefas_por_criacao(self.usuario_logado)
+                self.ctrl_tarefa.listar_tarefas_por_criacao()
             case "2":
-                self.ctrl_tarefa.listar_tarefas_por_finalizacao(self.usuario_logado)           
+                self.ctrl_tarefa.listar_tarefas_por_finalizacao()           
             case "3":                
                 self.main()
             case _:

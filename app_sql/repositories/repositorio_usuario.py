@@ -1,6 +1,7 @@
-from sqlite3 import IntegrityError
-from models.usuarios import Usuario
 from repositories.auxiliar_db import AuxiliarDB
+from models.usuarios import Usuario
+
+from sqlite3 import IntegrityError
 
 class RepositorioUsuario(AuxiliarDB):
     
