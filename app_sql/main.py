@@ -1,11 +1,13 @@
-from repositories.repositorio_usuario import RepositorioUsuario
 from controllers.controller_usuarios import ControllerUsuario
 
-# rep = RepositorioUsuario()
-# idu = rep.selecionar_usuario_por_username("aa")
-# print(idu)
+# TESTES
 
-c = ControllerUsuario().validar_credenciais("bb", "bb")
+ctrl = ControllerUsuario()
+ctrl.cadastrar_usuario("username3", "senha_forte3")
+
+user = input("user ")
+senha = input("senha ")
+c = ControllerUsuario().validar_credenciais(user, senha)
 if c:
     print("Usuário Logado com sucesso.")
 else:

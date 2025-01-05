@@ -1,15 +1,17 @@
-from sqlite3 import IntegrityError
 from models.usuarios import Usuario
-from repositories.conexao import ConexaoDB
+from repositories.conexao_db import ConexaoDB
 
-class RepositorioUsuario(ConexaoDB):
+class RepositorioUsuario():
     
     NOME_TABELA = "usuarios"   
 
     def __init__(self):
-        self.criar_tabela()
+        self.conexao = None
+        self.cursor = None
+        self.criar_tabela_usuario()
 
-    def criar_tabela(self):
+
+    def criar_tabela_usuario(self) -> None:
         sql = f"""CREATE TABLE IF NOT EXISTS {self.NOME_TABELA} (
                     id_usuario INTEGER PRIMARY KEY,
                     username TEXT NOT NULL UNIQUE,
@@ -17,92 +19,64 @@ class RepositorioUsuario(ConexaoDB):
                     salt TEXT
         )"""
         
-        self.executar_sql(sql, sql_tipo="CREATE_TABLE")        
+        self.executar_sql(sql)  
+        self.fechar_conexao()
     
         
-    def cadastrar_usuario(self, usuario: Usuario):            
+    def cadastrar_usuario(self, usuario: Usuario) -> None:            
         
         sql = f"""INSERT INTO {self.NOME_TABELA} (username, senha, salt) VALUES (?,?,?)"""
         
-        ultimo_id = self.executar_sql(sql, sql_tipo="INSERT", args=usuario.pegar_info_usuario())
+        info_usuario = usuario.pegar_info_usuario()
+        self.executar_sql(sql, info_usuario, comitar=True)
+        self.fechar_conexao()
 
-        return ultimo_id[0]        
+
+    def deletar_usuario(self, usuairo_id: int) -> None:
+
+        sql = f"""DELETE FROM {self.NOME_TABELA} WHERE id_usuario = ?"""
+        
+        self.executar_sql(sql, (usuairo_id,), comitar=True)
+        self.fechar_conexao() 
 
     
-    def selecionar_todos_usuario(self):
+    def selecionar_todos_usuario(self) -> list:
 
         sql = f"""SELECT id_usuario, username FROM {self.NOME_TABELA} ORDER BY id_usuario"""
 
-        resultado = self.executar_sql(sql, sql_tipo="SELECT")
-
+        resultado = self.executar_sql(sql).fetchall()
+        self.fechar_conexao()
+        
         return resultado
 
 
-    def selecionar_usuario_por_username(self, username):
+    def selecionar_usuario_por_username(self, username: str) -> tuple:
 
         sql = f"""SELECT * FROM {self.NOME_TABELA} WHERE username = ?"""
-        
-        resultado = self.executar_sql(sql, sql_tipo="SELECT", args=username)
+              
+        resultado = self.executar_sql(sql, (username,)).fetchone()        
+        self.fechar_conexao()
 
         return resultado
 
-
-    def deletar_usuario(self, usuario_id):
-
-        sql = f"""DELETE FROM {self.NOME_TABELA} WHERE usuario_id = ?"""
-
-        resultado = self.executar_sql(sql, sql_tipo="DELETE", args=usuario_id)
-
-        return resultado
-    
-
-    def executar_sql(self, sql, sql_tipo, args=None):
-        
+   
+    def executar_sql(self, sql, args:tuple=None, comitar=False):
+               
         # conexão com bando de dados
-        conexao = self.criar_conexao()
-        cursor = conexao.cursor()
+        self.conexao = ConexaoDB.criar_conexao()
+        self.cursor = self.conexao.cursor()
 
-        if sql_tipo == "CREATE_TABLE":
-            cursor.execute(sql)
-            conexao.commit() 
-            retorno = "Tabela criada com sucesso."
+        if args:
+            self.cursor.execute(sql, args)
+        else:
+            self.cursor.execute(sql)
 
-        elif sql_tipo == "SELECT" and args is None: # select all
-            retorno = cursor.execute(sql).fetchall()
+        if comitar:
+            self.conexao.commit()
 
-        elif sql_tipo == "SELECT" and args is not None: # select one
-            retorno = cursor.execute(sql, (args,)).fetchone()
+        return self.cursor     
 
-        elif sql_tipo == "INSERT":
-            cursor.execute(sql, args)
-            conexao.commit()     
-            retorno = cursor.execute("SELECT last_insert_rowid()").fetchone()
 
-        elif sql_tipo == "DELETE":
-            cursor.execute(sql,args)
-            conexao.commit()     
-            retorno = "Deletado com sucesso."
-        
-        return retorno
-    
-
-if __name__ == "__main__":
-
-    # Testes
-
-    # try:
-    #     u = Usuario("barry", "jillsandwich")
-    #     ultimo_id = RepositorioUsuario().cadastrar_usuario(u)
-    #     print(ultimo_id)
-    # except IntegrityError:
-    #     print("Username já existe")
-
-    resultado = RepositorioUsuario().selecionar_todos_usuario()
-    for r in resultado:
-        print(r)
-
-    a = RepositorioUsuario().selecionar_usuario_por_username("chris")
-    print(a)
-
-    #resultado = RepositorioUsuario().deletar_usuario()
-    #print(resultado)
+    def fechar_conexao(self) -> None:
+        self.cursor.close()
+        self.conexao.close()

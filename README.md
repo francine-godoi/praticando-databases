@@ -77,7 +77,13 @@ Futuramente, considero a possibilidade de criar uma terceira versão do sistema 
 
 ----
 
-## Referencias
+## 📚 Referencias
 
 [Storing and Retrieving Passwords Securely in Python
 By Gurpreet Kaur](https://www.askpython.com/python/examples/storing-retrieving-passwords-securely)
+
+----
+
+## 🛠️ Requerimentos
+
+`pip install python-dotenv`
