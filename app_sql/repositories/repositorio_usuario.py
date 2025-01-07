@@ -29,7 +29,7 @@ class RepositorioUsuario(AuxiliarDB):
         
         sql = f"""INSERT INTO {self.__NOME_TABELA} (username, senha, salt) VALUES (?,?,?)"""
         
-        info_usuario = usuario.pegar_info_usuario()
+        info_usuario = (usuario.username, usuario.senha, usuario.salt)
         try:
             self.executar_sql(sql, info_usuario, comitar=True)
             self.fechar_conexao()
@@ -37,24 +37,6 @@ class RepositorioUsuario(AuxiliarDB):
         except IntegrityError:
             self.fechar_conexao()
             return False
-
-
-    def deletar_usuario(self, usuairo_id: int) -> None:
-
-        sql = f"""DELETE FROM {self.__NOME_TABELA} WHERE id_usuario = ?"""
-        
-        self.executar_sql(sql, (usuairo_id,), comitar=True)
-        self.fechar_conexao() 
-
-    
-    def selecionar_todos_usuario(self) -> list:
-
-        sql = f"""SELECT id_usuario, username FROM {self.__NOME_TABELA} ORDER BY id_usuario"""
-
-        resultado = self.executar_sql(sql).fetchall()
-        self.fechar_conexao()
-        
-        return resultado
 
 
     def selecionar_usuario_por_username(self, username: str) -> tuple:
@@ -65,3 +47,22 @@ class RepositorioUsuario(AuxiliarDB):
         self.fechar_conexao()
 
         return resultado
+    
+    
+    def selecionar_todos_usuario(self) -> list:
+
+        sql = f"""SELECT id_usuario, username FROM {self.__NOME_TABELA} ORDER BY id_usuario"""
+
+        resultado = self.executar_sql(sql).fetchall()
+        self.fechar_conexao()
+        
+        return resultado
+    
+    
+    def deletar_usuario(self, usuairo_id: int) -> None:
+
+        sql = f"""DELETE FROM {self.__NOME_TABELA} WHERE id_usuario = ?"""
+        
+        self.executar_sql(sql, (usuairo_id,), comitar=True)
+        self.fechar_conexao() 
+

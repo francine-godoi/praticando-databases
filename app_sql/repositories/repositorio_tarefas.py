@@ -1,6 +1,122 @@
 from sqlite3 import IntegrityError
 from models.tarefas import Tarefa
 from repositories.auxiliar_db import AuxiliarDB
+from datetime import date
 
 class RepositorioTarefa(AuxiliarDB):
-    pass
+
+    __NOME_TABELA = "tarefas"
+    __FOREIGN_TABELA = "usuarios"
+
+    def __init__(self):
+        self.conexao = None
+        self.cursor = None
+        self.criar_tabela_tarefas()
+
+
+    def criar_tabela_tarefas(self) -> None:
+
+        sql = f"""CREATE TABLE IF NOT EXISTS {self.__NOME_TABELA} (
+                    id_tarefa INTEGER PRIMARY KEY,
+                    id_usuario INTEGER,
+                    descricao TEXT NOT NULL,
+                    importancia TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    criado_em TEXT NOT NULL,
+                    finalizado_em TEXT,
+                    FOREIGN KEY (id_usuario) REFERENCES {self.__FOREIGN_TABELA} (id_usuario)
+        )"""
+
+        self.executar_sql(sql)
+        self.fechar_conexao()
+    
+
+    def cadastrar_tarefa(self, tarefa: Tarefa) -> bool:
+
+        sql = f"""INSERT INTO {self.__NOME_TABELA} (id_usuario, descricao, importancia, status, criado_em) VALUES(?,?,?,?,?)"""
+        
+        data = date.today().strftime("%d/%m/%Y")
+        info_tarefa = (tarefa.id_usuario, tarefa.descricao, tarefa.importancia, "A", data)
+        try:
+            self.executar_sql(sql, info_tarefa, comitar=True)
+            self.fechar_conexao()
+            return True
+        except IntegrityError:
+            self.fechar_conexao()
+            return False
+
+
+    def editar_tarefa(self, tarefa:Tarefa) -> None:
+
+        sql = f"""UPDATE {self.__NOME_TABELA} SET descricao = ?, importancia = ? WHERE id_tarefa = ? AND status = 'A'"""
+
+        info_tarefa = (tarefa.descricao, tarefa.importancia, tarefa.id_tarefa)
+        self.executar_sql(sql, info_tarefa, comitar=True)
+        self.fechar_conexao()
+
+    
+    def deletar_tarefa(self, id_tarefa:int) -> None:
+
+        sql = f"""DELETE FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A'"""
+
+        self.executar_sql(sql, (id_tarefa,), comitar=True)
+        self.fechar_conexao()
+
+        
+    def finalizar_tarefa(self, id_tarefa:int) -> None:
+
+        sql = f"""UPDATE {self.__NOME_TABELA} SET status = 'F', finalizado_em = ? WHERE id_tarefa = ?"""
+
+        data = date.today().strftime("%d/%m/%Y")
+        self.executar_sql(sql, (data, id_tarefa), comitar=True)
+        self.fechar_conexao()
+
+
+    def selecionar_todas_tarefas(self, id_usuario: int) -> list:
+
+        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? ORDER BY id_tarefa"""
+
+        resultado = self.executar_sql(sql, (id_usuario,)).fetchall()
+        self.fechar_conexao()
+
+        return resultado
+    
+
+    def selecionar_tarefas_por_status(self, id_usuario: int, status: str) -> list:
+
+        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND status = ? ORDER BY id_tarefa"""
+
+        resultado = self.executar_sql(sql, (id_usuario, status)).fetchall()
+        self.fechar_conexao()
+
+        return resultado
+    
+
+    def selecionar_tarefas_por_importancia(self, id_usuario: int, importancia: str) -> list:
+
+        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND importancia = ? ORDER BY id_tarefa"""
+
+        resultado = self.executar_sql(sql, (id_usuario, importancia)).fetchall()
+        self.fechar_conexao()
+
+        return resultado
+    
+
+    def selecionar_tarefas_por_criacao(self, id_usuario: int, data_inicio:date, data_final:date) -> list:
+
+        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND criado_em >= ? AND criado_em <= ? ORDER BY id_tarefa"""
+
+        resultado = self.executar_sql(sql, (id_usuario, data_inicio, data_final)).fetchall()
+        self.fechar_conexao()
+
+        return resultado
+    
+
+    def selecionar_tarefas_por_finalizacao(self, id_usuario: int, data_inicio: date, data_final: date) -> list:
+
+        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND finalizado_em >= ? AND finalizado_em <= ? ORDER BY id_tarefa"""
+
+        resultado = self.executar_sql(sql, (id_usuario, data_inicio, data_final)).fetchall()
+        self.fechar_conexao()
+
+        return resultado
