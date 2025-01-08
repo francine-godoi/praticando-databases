@@ -65,7 +65,7 @@ class ControllerMenus:
             case "1":
                 self.ctrl_tarefa.listar_todas_tarefas()
             case "2":
-                self.ctrl_tarefa.listar_tarefas_andamento()
+                self.ctrl_tarefa.listar_tarefas_em_andamento()
             case "3":
                 self.ctrl_tarefa.listar_tarefas_finalizadas()
             case "4":

@@ -26,3 +26,7 @@ class TelaTarefas:
         print("1. Criação.")
         print("2. Finalização.")
         print("3. Voltar.\n")
+
+    def exibir_tarefas(self, tarefas) -> None:
+        #TODO fazer
+        pass

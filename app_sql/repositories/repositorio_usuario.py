@@ -25,18 +25,18 @@ class RepositorioUsuario(AuxiliarDB):
         self.fechar_conexao()
     
         
-    def cadastrar_usuario(self, usuario: Usuario) -> None:            
+    def cadastrar_usuario(self, usuario: Usuario) -> int:            
         
         sql = f"""INSERT INTO {self.__NOME_TABELA} (username, senha, salt) VALUES (?,?,?)"""
         
         info_usuario = (usuario.username, usuario.senha, usuario.salt)
         try:
-            self.executar_sql(sql, info_usuario, comitar=True)
+            resultado = self.executar_sql(sql, info_usuario, comitar=True).rowcount
             self.fechar_conexao()
-            return True
+            return resultado
         except IntegrityError:
             self.fechar_conexao()
-            return False
+            return 0
 
 
     def selecionar_usuario_por_username(self, username: str) -> tuple:
@@ -59,10 +59,12 @@ class RepositorioUsuario(AuxiliarDB):
         return resultado
     
     
-    def deletar_usuario(self, usuairo_id: int) -> None:
+    def deletar_usuario(self, usuairo_id: int) -> int:
 
         sql = f"""DELETE FROM {self.__NOME_TABELA} WHERE id_usuario = ?"""
         
-        self.executar_sql(sql, (usuairo_id,), comitar=True)
+        resultado = self.executar_sql(sql, (usuairo_id,), comitar=True).rowcount
         self.fechar_conexao() 
+
+        return resultado
 

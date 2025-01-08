@@ -38,7 +38,7 @@ class ControllerUsuarios:
             return self.cadastrar_usuario()           
 
 
-    def validar_credenciais(self) -> tuple | bool:
+    def validar_credenciais(self) -> tuple | int:
         
         username = input("\nUsuário: ").strip()
         senha = input("Senha: ").strip()
