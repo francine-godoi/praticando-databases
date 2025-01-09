@@ -22,7 +22,6 @@ class ControllerMenus:
 
 
     def tratar_opcao_menu_inicial(self, escolha: str) -> None:
-
         match escolha:
             case "1":
                 self.ctrl_usuario.cadastrar_usuario()
@@ -65,9 +64,9 @@ class ControllerMenus:
             case "1":
                 self.ctrl_tarefa.listar_todas_tarefas()
             case "2":
-                self.ctrl_tarefa.listar_tarefas_em_andamento()
+                self.ctrl_tarefa.listar_tarefas_por_status("A")
             case "3":
-                self.ctrl_tarefa.listar_tarefas_finalizadas()
+                self.ctrl_tarefa.listar_tarefas_por_status("F")
             case "4":
                 self.tratar_opcao_submenu_listar_por_data()
             case "5":
@@ -85,9 +84,9 @@ class ControllerMenus:
 
         match escolha:
             case "1":
-                self.ctrl_tarefa.listar_tarefas_por_criacao()
+                self.ctrl_tarefa.listar_tarefas_por_data("criado_em")
             case "2":
-                self.ctrl_tarefa.listar_tarefas_por_finalizacao()           
+                self.ctrl_tarefa.listar_tarefas_por_data("finalizado_em")           
             case "3":                
                 self.main()
             case _:

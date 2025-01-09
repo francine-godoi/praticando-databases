@@ -77,16 +77,18 @@ class RepositorioTarefa(AuxiliarDB):
 
     def selecionar_todas_tarefas(self, id_usuario: int) -> list:
 
-        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? ORDER BY id_tarefa"""
 
         resultado = self.executar_sql(sql, (id_usuario,)).fetchall()
         self.fechar_conexao()
 
         return resultado
     
-    def selecionar_tarefa_por_id(self, id_tarefa: int) -> list:
 
-        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_tarefa = ?"""
+    def selecionar_tarefa_por_id(self, id_tarefa: int) -> list:
+        """ retorna id_usuario, descricao, importancia, status """
+
+        sql = f"""SELECT id_usuario, descricao, importancia, status FROM {self.__NOME_TABELA} WHERE id_tarefa = ? ORDER BY id_tarefa"""
 
         resultado = self.executar_sql(sql, (id_tarefa,)).fetchone()
         self.fechar_conexao()
@@ -95,8 +97,9 @@ class RepositorioTarefa(AuxiliarDB):
 
 
     def selecionar_tarefas_por_status(self, id_usuario: int, status: str) -> list:
+        """ retorna id_tarefa, descricao, importancia """
 
-        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND status = ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND status = ? ORDER BY id_tarefa"""
 
         resultado = self.executar_sql(sql, (id_usuario, status)).fetchall()
         self.fechar_conexao()
@@ -105,8 +108,9 @@ class RepositorioTarefa(AuxiliarDB):
     
 
     def selecionar_tarefas_por_importancia(self, id_usuario: int, importancia: str) -> list:
+        """ retorna id_tarefa, descricao, importancia, status, criado_em, finalizado_em """
 
-        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND importancia = ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND importancia = ? ORDER BY id_tarefa"""
 
         resultado = self.executar_sql(sql, (id_usuario, importancia)).fetchall()
         self.fechar_conexao()
@@ -114,9 +118,10 @@ class RepositorioTarefa(AuxiliarDB):
         return resultado
     
 
-    def selecionar_tarefas_por_data(self, tipo_data: str, id_usuario: int, data_inicio: date, data_final: date) -> list:
+    def selecionar_tarefas_por_data(self, tipo_data: str, id_usuario: int, data_inicio: str, data_final: str) -> list:
+        """ retorna id_tarefa, descricao, importancia, status, criado_em, finalizado_em """
 
-        sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND {tipo_data} >= ? AND {tipo_data} <= ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND {tipo_data} >= ? AND {tipo_data} <= ? ORDER BY id_tarefa"""
 
         resultado = self.executar_sql(sql, (id_usuario, data_inicio, data_final)).fetchall()
         self.fechar_conexao()

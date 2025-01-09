@@ -2,8 +2,7 @@ from repositories.conexao_db import ConexaoDB
 
 class AuxiliarDB():
     
-    def executar_sql(self, sql: str, args:tuple=(), comitar=False):
-               
+    def executar_sql(self, sql: str, args:tuple=(), comitar=False):               
         # conexão com bando de dados
         self.conexao = ConexaoDB.criar_conexao()
         self.cursor = self.conexao.cursor()

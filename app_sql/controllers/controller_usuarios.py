@@ -23,7 +23,7 @@ class ControllerUsuarios:
             return self.cadastrar_usuario()
         
         if not self.verificar_senha_forte(senha):
-            print("A senha deve conter pelo menos 8 caracteres, incluindo:\n letras maiúsculas, minúsculas, números e caracteres especiais\n")
+            print("A senha deve conter pelo menos 8 caracteres, incluindo:\nletras maiúsculas, minúsculas, números e caracteres especiais\n")
             return self.cadastrar_usuario()
 
         salt = self.gerar_salt()

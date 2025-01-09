@@ -47,24 +47,3 @@ class RepositorioUsuario(AuxiliarDB):
         self.fechar_conexao()
 
         return resultado
-    
-    
-    def selecionar_todos_usuario(self) -> list:
-
-        sql = f"""SELECT id_usuario, username FROM {self.__NOME_TABELA} ORDER BY id_usuario"""
-
-        resultado = self.executar_sql(sql).fetchall()
-        self.fechar_conexao()
-        
-        return resultado
-    
-    
-    def deletar_usuario(self, usuairo_id: int) -> int:
-
-        sql = f"""DELETE FROM {self.__NOME_TABELA} WHERE id_usuario = ?"""
-        
-        resultado = self.executar_sql(sql, (usuairo_id,), comitar=True).rowcount
-        self.fechar_conexao() 
-
-        return resultado
-
