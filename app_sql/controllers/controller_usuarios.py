@@ -1,11 +1,6 @@
 from models.usuarios import Usuario
 from repositories.repositorio_usuario import RepositorioUsuario
-
-from hashlib import sha256
-from os import getenv, urandom
-import re
-
-from dotenv import load_dotenv
+from utils.auxiliar_senhas import pegar_senha_tratada, gerar_salt
 
 class ControllerUsuarios:
 
@@ -22,12 +17,11 @@ class ControllerUsuarios:
             print("Campos em branco.\n")
             return self.cadastrar_usuario()
         
-        if not self.verificar_senha_forte(senha):
-            print("A senha deve conter pelo menos 8 caracteres, incluindo:\nletras maiúsculas, minúsculas, números e caracteres especiais\n")
+        salt = gerar_salt()
+        hashed_senha = pegar_senha_tratada(salt, senha)
+        if not hashed_senha:
             return self.cadastrar_usuario()
-
-        salt = self.gerar_salt()
-        hashed_senha = self.hash_senha(salt, senha)
+        
         user = Usuario(username, hashed_senha, salt)
         
         cadastrado = self.repo_usuario.cadastrar_usuario(user)
@@ -51,7 +45,7 @@ class ControllerUsuarios:
         
         id_usuario, username_salvo, senha_salva, salt_salvo = info_usuario
 
-        senha_tratada = self.hash_senha(salt_salvo, senha)
+        senha_tratada = pegar_senha_tratada(salt_salvo, senha)
 
         if senha_salva == senha_tratada and username_salvo == username:
             print("Logado com sucesso!\n")
@@ -59,36 +53,3 @@ class ControllerUsuarios:
         else:
             print("Usuário ou Senha Inválidos.")
             return 0
-
-    
-    def verificar_senha_forte(self, senha) -> bool:        
-        """
-        ^
-        (?=.*[0-9])           // deve conter ao menos um dígito
-        (?=.*[a-z])           // deve conter ao menos uma letra minúscula
-        (?=.*[A-Z])           // deve conter ao menos uma letra maiúscula
-        (?=.*[$&@#])          // deve conter ao menos um caractere especial
-        [a-zA-Z0-9$&@#]{8,}   // deve conter ao menos 8 caracteres 
-        $
-        """
-        senha_forte = r"^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[$&@#])[a-zA-Z0-9$&@#]{8,}$"       
-        return bool(re.match(senha_forte, senha))
-    
-    
-    @staticmethod
-    def gerar_salt() -> bytes:
-        # valor de salt 128 bits
-        salt = urandom(16)        
-        return salt    
-
-
-    @staticmethod
-    def gerar_pepper() -> bytes:   
-        load_dotenv()
-        pepper = getenv("PEPPER")           
-        return pepper.encode()
-
-
-    def hash_senha(self, salt: bytes, senha: str) -> bytes: 
-        senha_hash = sha256(salt + senha.encode() + self.gerar_pepper())        
-        return salt + senha_hash.digest()

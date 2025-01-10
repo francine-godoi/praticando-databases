@@ -1,4 +1,3 @@
-from sqlite3 import IntegrityError
 from models.tarefas import Tarefa
 from repositories.auxiliar_db import AuxiliarDB
 from datetime import date
@@ -85,12 +84,12 @@ class RepositorioTarefa(AuxiliarDB):
         return resultado
     
 
-    def selecionar_tarefa_por_id(self, id_tarefa: int) -> list:
+    def selecionar_tarefa_por_id(self, id_tarefa: int, id_usuario: int) -> list:
         """ retorna id_usuario, descricao, importancia, status """
 
-        sql = f"""SELECT id_usuario, descricao, importancia, status FROM {self.__NOME_TABELA} WHERE id_tarefa = ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_usuario, descricao, importancia, status, id_tarefa FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A' and id_usuario = ? ORDER BY id_tarefa"""
 
-        resultado = self.executar_sql(sql, (id_tarefa,)).fetchone()
+        resultado = self.executar_sql(sql, (id_tarefa, id_usuario)).fetchone()
         self.fechar_conexao()
         
         return resultado

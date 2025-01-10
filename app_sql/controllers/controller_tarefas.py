@@ -36,12 +36,10 @@ class ControllerTarefas:
 
         self.motrar_tarefas_andamento()
 
-        id_tarefa = self.pegar_id_tarefa()
-        if id_tarefa == 0: # id inválida
+        tarefa_selecionada = self.selecionar_tarefa_por_id()
+        if tarefa_selecionada == 0: # id inválida
             return self.editar_tarefa()
         
-        tarefa_selecionada = self.repo_tarefa.selecionar_tarefa_por_id(id_tarefa)
-
         print("\nInformações atuais: ")
         print(f"Descrição: {tarefa_selecionada[1]} - Importância: {tarefa_selecionada[2]}\n") 
 
@@ -57,7 +55,7 @@ class ControllerTarefas:
         if importancia == "":
             importancia = tarefa_selecionada[2]
 
-        tarefa = Tarefa(self.id_usuario, descricao, importancia, id_tarefa)
+        tarefa = Tarefa(self.id_usuario, descricao, importancia, tarefa_selecionada[4])
 
         editado = self.repo_tarefa.editar_tarefa(tarefa)
         if editado:
@@ -72,11 +70,11 @@ class ControllerTarefas:
 
         self.motrar_tarefas_andamento()
 
-        id_tarefa = self.pegar_id_tarefa()
-        if id_tarefa == 0: # id inválida
+        tarefa_selecionada = self.selecionar_tarefa_por_id()
+        if tarefa_selecionada == 0: # id inválida
             return self.excluir_tarefa()
 
-        deletado = self.repo_tarefa.deletar_tarefa(id_tarefa)
+        deletado = self.repo_tarefa.deletar_tarefa(tarefa_selecionada[4])
         if deletado:
             print("Tarefa excluida com sucesso.\n")                        
         else:
@@ -89,11 +87,11 @@ class ControllerTarefas:
 
         self.motrar_tarefas_andamento()
 
-        id_tarefa = self.pegar_id_tarefa()
-        if id_tarefa == 0: # id inválida
+        tarefa_selecionada = self.selecionar_tarefa_por_id()
+        if tarefa_selecionada == 0: # id inválida
             return self.finalizar_tarefa()
         
-        finalizada = self.repo_tarefa.finalizar_tarefa(id_tarefa)
+        finalizada = self.repo_tarefa.finalizar_tarefa(tarefa_selecionada[4])
         if finalizada:
             print("Tarefa finalizada com sucesso.\n")            
         else:
@@ -119,23 +117,15 @@ class ControllerTarefas:
                 print(f"Id: {tarefa[0]} - Descrição: {tarefa[1]} - Importância: {tarefa[2]}")
 
 
-    def pegar_id_tarefa(self) -> int:
+    def selecionar_tarefa_por_id(self) -> int | Tarefa:
         id_tarefa = input("Qual o id da tarefa? ")
-        tarefa_selecionada = self.repo_tarefa.selecionar_tarefa_por_id(id_tarefa)
+        tarefa_selecionada = self.repo_tarefa.selecionar_tarefa_por_id(id_tarefa, self.id_usuario)
 
         if not tarefa_selecionada:
-            print("Tarefa não cadastrada.\n")
-            return 0
-
-        if tarefa_selecionada[0] != self.id_usuario:
-            print("Tarefa não pertence ao usuário.\n")
+            print("Não foi possível selecionar a tarefa. Favor consultar a tabela.\n")
             return 0
         
-        if tarefa_selecionada[3] != "A":
-            print("Essa tarefa já foi finalizada.\n")
-            return 0
-        
-        return id_tarefa
+        return tarefa_selecionada
 
 
     def listar_todas_tarefas(self) -> None:
