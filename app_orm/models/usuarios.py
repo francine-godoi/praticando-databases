@@ -1,5 +1,6 @@
-from sqlalchemy import Column, String, Integer
+from sqlalchemy import Column, Integer, String
 from utils.conexao_db import Base
+
 
 class Usuario(Base):
 
@@ -11,8 +12,8 @@ class Usuario(Base):
     salt = Column("salt", String, nullable=False)
 
     def __init__(self, username: str, senha: str, salt: str):
-        self.username = username        
-        self.senha = senha   
+        self.username = username
+        self.senha = senha
         self.salt = salt
 
     def pegar_info_usuario(self) -> tuple:
