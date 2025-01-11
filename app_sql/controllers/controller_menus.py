@@ -1,7 +1,8 @@
-from controllers.controller_usuarios import ControllerUsuarios
 from controllers.controller_tarefas import ControllerTarefas
+from controllers.controller_usuarios import ControllerUsuarios
 from views.tela_inicial import TelaInicial
 from views.tela_tarefas import TelaTarefas
+
 
 class ControllerMenus:
 
@@ -12,30 +13,28 @@ class ControllerMenus:
         self.ctrl_tarefa = None
         self.usuario_logado = False
 
-
     def mostrar_menu_inicial(self) -> None:
         self.tela_inicial.mostrar_menu_inicial()
 
-
-    def mostrar_menu_tarefas(self) -> None:        
+    def mostrar_menu_tarefas(self) -> None:
         self.tela_tarefas.mostrar_menu_tarefas(self.usuario_logado)
-
 
     def tratar_opcao_menu_inicial(self, escolha: str) -> None:
         match escolha:
             case "1":
                 self.ctrl_usuario.cadastrar_usuario()
             case "2":
-                usuario_logado = self.ctrl_usuario.validar_credenciais()                
-                if usuario_logado:                    
-                    self.usuario_logado = usuario_logado[1] # username
-                    self.ctrl_tarefa = ControllerTarefas(usuario_logado[0]) # id_usuario
+                usuario_logado = self.ctrl_usuario.validar_credenciais()
+                if usuario_logado:
+                    self.usuario_logado = usuario_logado[1]  # username
+                    self.ctrl_tarefa = ControllerTarefas(
+                        usuario_logado[0]
+                    )  # id_usuario
             case "3":
                 print("Tchau!!")
                 exit()
             case _:
-                print("Opção inválida.\n")                
-            
+                print("Opção inválida.\n")
 
     def tratar_opcao_menu_tarefas(self, escolha: str) -> None:
         match escolha:
@@ -54,7 +53,6 @@ class ControllerMenus:
                 self.main()
             case _:
                 print("Opção inválida.\n")
-                
 
     def tratar_opcao_submenu_listar_tarefas(self) -> None:
         self.tela_tarefas.mostrar_submenu_listar_tarefas()
@@ -71,12 +69,11 @@ class ControllerMenus:
                 self.tratar_opcao_submenu_listar_por_data()
             case "5":
                 self.ctrl_tarefa.listar_tarefas_por_importancia()
-            case "6":                
+            case "6":
                 self.main()
             case _:
-                print("Opção inválida.\n") 
-                return self.tratar_opcao_submenu_listar_tarefas()       
-
+                print("Opção inválida.\n")
+                return self.tratar_opcao_submenu_listar_tarefas()
 
     def tratar_opcao_submenu_listar_por_data(self) -> None:
         self.tela_tarefas.mostrar_submenu_listar_por_data()
@@ -86,13 +83,12 @@ class ControllerMenus:
             case "1":
                 self.ctrl_tarefa.listar_tarefas_por_data("criado_em")
             case "2":
-                self.ctrl_tarefa.listar_tarefas_por_data("finalizado_em")           
-            case "3":                
+                self.ctrl_tarefa.listar_tarefas_por_data("finalizado_em")
+            case "3":
                 self.main()
             case _:
                 print("Opção inválida.\n")
-                return self.tratar_opcao_submenu_listar_por_data()      
-
+                return self.tratar_opcao_submenu_listar_por_data()
 
     def main(self):
         while not self.usuario_logado:
@@ -100,7 +96,6 @@ class ControllerMenus:
             escolha = input("Digite sua escolha: ")
             self.tratar_opcao_menu_inicial(escolha)
 
-        
         while self.usuario_logado:
             self.mostrar_menu_tarefas()
             escolha = input("Digite sua escolha: ")
