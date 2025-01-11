@@ -5,13 +5,13 @@
 Segundo mini projeto (via terminal) aplicando conceitos vistos durante minha jornada para aprender Python:
 
     1. Lógica de programação
-    2. POO 
+    2. POO
     3. MVC
     4. Sql puro (Sqlite)
     5. SqlAlchemy ORM
     6. NoSql (MongoDB) - futuramente
 
-----
+---
 
 ## 🧩 Justificativa para o projeto
 
@@ -22,73 +22,72 @@ Resolvi então a juntar esse projeto com a "lista de tarefas" que é um dos proj
 Outra vantagem de juntar os dois projetos é que agora terei duas tabelas relacionadas para trabalhar com o banco de dados, coisa que não seria possível apenas com o sistema de login.
 
 Para melhor aproveitar e treinar os conhecimentos que adquiri até o momento resolvi criar duas versões desse projeto:
+
 1. Usando Sql puro
 2. Usando o SqlAlchemy ORM
-   
+
 Dessa forma também posso ver por conta própria a diferença na implementação dos dois.
 
 Futuramente, considero a possibilidade de criar uma terceira versão do sistema usando NoSql, já que também estudei MongoDB e portanto devo pratica-lo.
 
-----
+---
 
 ## 📝 Requisitos do Sistema / Funcionalidades
 
 ### Tela inicial
 
+<!-- trunk-ignore(markdownlint/MD033) -->
+
 - <ins>Cadastrar novo usuário:</ins> Usuario, Senha.
   <br>**Restrições:**
-    - Campo usuário deve ser único;
-    - Senha deve ter pelo menos 8 caracteres, incluindo: letras maiúsculas, minúsculas, números e caracteres especiais;
-  
+  - Campo usuário deve ser único;
+  - Senha deve ter pelo menos 8 caracteres, incluindo: letras maiúsculas, minúsculas, números e caracteres especiais;
 - <ins>Fazer Login:</ins> Leva o usuário ao sistema de lista de tarefas.
 - <ins>Sair do sistema</ins>
 
-
 ### Tela de Lista de Tarefas
+
 **Restrição:** usuário deve estar logado para acessar essa tela
 
 - <ins>Adicionar tarefa:</ins> Descrição, Importância (Alta/Média/Baixa).
   <br>O sistema adiciona automaticamente a data de criação e status "Em andamento";
-  
 - <ins>Editar tarefa:</ins> Descrição, Importância. A escolha da tarefa é feita por código.
   <br>**Restrição:** Alteração é permitida apenas para tarefas com status "Em andamento";
-  
 - <ins>Excluir tarefa:</ins> A escolha da tarefa é feita por código.
   <br>O sistema dá a opção de listar todas as tarefas "Em andamento" para o usuário consultar o código.
   <br>**Restrição:** Alteração é permitida apenas para tarefas com status "Em andamento";
-  
 - <ins>Finalizar tarefa:</ins> A escolha da tarefa é feita por código.
   <br>O sistema dá a opção de listar todas as tarefas "Em andamento" para o usuário consultar o código.
   <br>Atualiza status para "Finalizado" e adiciona a data de finalização.
-  
 - <ins>Listar tarefas:</ins> Opções:
   - Todas
   - Em andamento
   - Finalizadas
   - Por data
-    - Data criação 
+    - Data criação
     - Data finalização
   - Por importância
     - Alta
     - Média
     - Baixa
-    
 - <ins>Sair/Logout:</ins> Finaliza a sessão do usuáiro e volta para a tela inicial
 
-----
+---
 
 ## 🔀 Diagrama ER
 
 ![diagrama_er_sistema_login_lista_tarefas](https://github.com/user-attachments/assets/930f88e0-8241-4d56-bac0-bded6c9c6ea0)
 
-----
+---
 
 ## 📚 Referencias
 
 [Storing and Retrieving Passwords Securely in Python
 By Gurpreet Kaur](https://www.askpython.com/python/examples/storing-retrieving-passwords-securely)
 
-----
+[Como Criar Banco de Dados em Python SQLAlchemy por Hashtag Programação](https://www.youtube.com/watch?v=W-g6StRy1zY)
+
+---
 
 ## 🛠️ Requerimentos
 
