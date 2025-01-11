@@ -1,8 +1,10 @@
 class Usuario:
 
-    def __init__(self, username: str, senha: str, salt: str, id_usuario: int = None) -> None:
-        self.username = username        
-        self.senha = senha   
+    def __init__(
+        self, username: str, senha: str, salt: str, id_usuario: int = None
+    ) -> None:
+        self.username = username
+        self.senha = senha
         self.salt = salt
         self.id_usuario = id_usuario
 
