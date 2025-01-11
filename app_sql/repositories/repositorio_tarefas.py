@@ -58,25 +58,27 @@ class RepositorioTarefa(AuxiliarDB):
 
         return resultado
 
-    def excluir_tarefa(self, id_tarefa: int) -> int:
+    def excluir_tarefa(self, tarefa: Tarefa) -> int:
 
         sql = (
             # trunk-ignore(bandit/B608)
             f"""DELETE FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A'"""
         )
 
-        resultado = self.executar_sql(sql, (id_tarefa,), comitar=True).rowcount
+        resultado = self.executar_sql(sql, (tarefa.id_tarefa,), comitar=True).rowcount
         self.fechar_conexao()
 
         return resultado
 
-    def finalizar_tarefa(self, id_tarefa: int) -> int:
+    def finalizar_tarefa(self, tarefa: Tarefa) -> int:
 
         # trunk-ignore(bandit/B608)
         sql = f"""UPDATE {self.__NOME_TABELA} SET status = 'F', finalizado_em = ? WHERE id_tarefa = ? AND status = 'A'"""
 
         data = date.today().strftime("%d/%m/%Y")
-        resultado = self.executar_sql(sql, (data, id_tarefa), comitar=True).rowcount
+        resultado = self.executar_sql(
+            sql, (data, tarefa.id_tarefa), comitar=True
+        ).rowcount
         self.fechar_conexao()
 
         return resultado
@@ -166,13 +168,13 @@ class RepositorioTarefa(AuxiliarDB):
         lista_tarefas = []
         for resultado in resultados:
             tarefa = Tarefa(
-                id_usuario=id_usuario,
-                id_tarefa=resultado[0],
-                descricao=resultado[1],
-                importancia=resultado[2],
-                status=resultado[3],
-                criado_em=resultado[4],
-                finalizado_em=resultado[5],
+                id_usuario = id_usuario,
+                id_tarefa = resultado[0],
+                descricao = resultado[1],
+                importancia = resultado[2],
+                status = resultado[3],
+                criado_em = resultado[4],
+                finalizado_em = resultado[5],
             )
             lista_tarefas.append(tarefa)
 
