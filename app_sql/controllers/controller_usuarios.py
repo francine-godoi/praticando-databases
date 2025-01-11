@@ -1,10 +1,10 @@
 from models.usuarios import Usuario
 from repositories.repositorio_usuario import RepositorioUsuario
-from utils.auxiliar_senhas import pegar_senha_tratada, gerar_salt
+from utils.auxiliar_senhas import gerar_salt, pegar_senha_tratada
 
 class ControllerUsuarios:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.repo_usuario = RepositorioUsuario()      
         
 
@@ -22,9 +22,9 @@ class ControllerUsuarios:
         if not hashed_senha:
             return self.cadastrar_usuario()
         
-        user = Usuario(username, hashed_senha, salt)
+        usuario = Usuario(username, hashed_senha, salt)
         
-        cadastrado = self.repo_usuario.cadastrar_usuario(user)
+        cadastrado = self.repo_usuario.cadastrar_usuario(usuario)
         if cadastrado:
             print("Cadastrado com sucesso.\n")                        
         else:
@@ -37,19 +37,17 @@ class ControllerUsuarios:
         username = input("\nUsuário: ").strip()
         senha = input("Senha: ").strip()
         
-        info_usuario = self.repo_usuario.selecionar_usuario_por_username(username)
+        usuario = self.repo_usuario.selecionar_usuario_por_username(username)
 
-        if not info_usuario:
+        if not usuario:
             print("Usuário não Cadastrado.\n")
             return 0
         
-        id_usuario, username_salvo, senha_salva, salt_salvo = info_usuario
+        senha_tratada = pegar_senha_tratada(usuario.salt, senha)
 
-        senha_tratada = pegar_senha_tratada(salt_salvo, senha)
-
-        if senha_salva == senha_tratada and username_salvo == username:
+        if usuario.senha == senha_tratada and usuario.username == username:
             print("Logado com sucesso!\n")
-            return (id_usuario, username_salvo)
+            return (usuario.id_usuario, usuario.username)
         else:
             print("Usuário ou Senha Inválidos.")
             return 0

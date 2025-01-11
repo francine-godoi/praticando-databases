@@ -1,3 +1,5 @@
+from models.tarefas import Tarefa
+
 class TelaTarefas:
 
     def mostrar_menu_tarefas(self, username:str) -> None:
@@ -28,14 +30,14 @@ class TelaTarefas:
         print("3. Voltar.\n")
 
 
-    def exibir_tarefas(self, tarefas) -> None:
+    def exibir_tarefas(self, tarefas: list[Tarefa]) -> None:
         
         print("Id   Descrição                              Importância      Status           Criado     Finalizado")
         opcoes = {"A": "Alta", "B": "Baixa", "M": "Média"}
         for tarefa in tarefas:
             importancia = ""
-            if tarefa[2] in opcoes:
-                importancia = opcoes[tarefa[2]]
+            if tarefa.importancia in opcoes:
+                importancia = opcoes[tarefa.importancia]
 
-            print(f"{tarefa[0]: <3}  {tarefa[1]: <35}  {importancia: ^15}  {'Em andamento' if tarefa[3] == 'A' else 'Finalizada': <15}  {tarefa[4]: <10} - {tarefa[5] if tarefa[5] is not None else '    -    ': <10}")
+            print(f"{tarefa.id_tarefa: <3}  {tarefa.descricao: <35}  {importancia: ^15}  {'Em andamento' if tarefa.status == 'A' else 'Finalizada': <15}  {tarefa.criado_em: <10} - {tarefa.finalizado_em if tarefa.finalizado_em is not None else '    -    ': <10}")
         print("\n")

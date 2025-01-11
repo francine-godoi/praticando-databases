@@ -1,5 +1,5 @@
-from repositories.auxiliar_db import AuxiliarDB
 from models.usuarios import Usuario
+from repositories.auxiliar_db import AuxiliarDB
 
 from sqlite3 import IntegrityError
 
@@ -7,7 +7,7 @@ class RepositorioUsuario(AuxiliarDB):
     
     __NOME_TABELA = "usuarios"   
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.conexao = None
         self.cursor = None
         self.criar_tabela_usuario()
@@ -39,11 +39,14 @@ class RepositorioUsuario(AuxiliarDB):
             return 0
 
 
-    def selecionar_usuario_por_username(self, username: str) -> tuple:
+    def selecionar_usuario_por_username(self, username: str) -> Usuario:
 
         sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE username = ?"""
               
         resultado = self.executar_sql(sql, (username,)).fetchone()        
         self.fechar_conexao()
 
-        return resultado
+        # 1 = username, 2 = senha, 3 = salt, 1 = id_usuario
+        usuario = Usuario(resultado[1], resultado[2], resultado[3], resultado[0])
+
+        return usuario

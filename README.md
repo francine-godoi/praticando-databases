@@ -93,6 +93,7 @@ By Gurpreet Kaur](https://www.askpython.com/python/examples/storing-retrieving-p
 ## 🛠️ Requerimentos
 
     `pip install python-dotenv`
+    `pip install sqlalchemy`
 
 Criar um arquivo .env e armazenar a variável "PEPPER" que será usada no hash das senhas durante o cadastro do usuário.
 

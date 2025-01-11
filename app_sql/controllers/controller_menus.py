@@ -5,7 +5,7 @@ from views.tela_tarefas import TelaTarefas
 
 class ControllerMenus:
 
-    def __init__(self):
+    def __init__(self) -> None:
         self.tela_inicial = TelaInicial()
         self.tela_tarefas = TelaTarefas()
         self.ctrl_usuario = ControllerUsuarios()
