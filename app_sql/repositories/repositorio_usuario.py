@@ -38,7 +38,7 @@ class RepositorioUsuario(AuxiliarDB):
             self.fechar_conexao()
             return 0
 
-    def selecionar_usuario_por_username(self, username: str) -> Usuario:
+    def selecionar_usuario_por_username(self, username: str) -> Usuario | int:
 
         # trunk-ignore(bandit/B608)
         sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE username = ?"""
@@ -46,6 +46,8 @@ class RepositorioUsuario(AuxiliarDB):
         resultado = self.executar_sql(sql, (username,)).fetchone()
         self.fechar_conexao()
 
+        if not resultado:
+            return 0
         # 1 = username, 2 = senha, 3 = salt, 1 = id_usuario
         usuario = Usuario(resultado[1], resultado[2], resultado[3], resultado[0])
 
