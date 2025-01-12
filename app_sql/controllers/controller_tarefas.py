@@ -26,13 +26,13 @@ class ControllerTarefas:
         if cadastrado:
             self.tela_tarefas.mostrar_mensagem("Tarefa cadastrada com sucesso.")
         else:
-            self.tela_tarefas.mostrar_mensagem("Não foi possível cadastar a tarefa.")
+            self.tela_tarefas.mostrar_mensagem("Não foi possível cadastrar a tarefa.")
 
     def editar_tarefa(self) -> None:
         # pega a tarefa a ser editada
         tarefa_selecionada = self.pegar_tarefa_para_realizar_operacao()
         if not tarefa_selecionada:
-            return self.editar_tarefa()
+            return
 
         # pega novas informações com usuário
         nova_descricao, nova_importancia = (
@@ -47,15 +47,15 @@ class ControllerTarefas:
             nova_importancia = tarefa_selecionada.importancia
 
         # cria uma tarefa com as informações editadas
-        tarefa = Tarefa(
-            self.id_usuario,
-            nova_descricao,
-            nova_importancia,
-            tarefa_selecionada.id_tarefa,
-        )
+        novos_dados = {
+            'id_usuario': self.id_usuario,
+            'descricao': nova_descricao,
+            'importancia': nova_importancia,
+            'id_tarefa': tarefa_selecionada.id_tarefa,
+        }
 
         # salva a edição no banco
-        editado = self.repo_tarefa.editar_tarefa(tarefa)
+        editado = self.repo_tarefa.editar_tarefa(novos_dados)
         if editado:
             self.tela_tarefas.mostrar_mensagem("Tarefa editada com sucesso!")
         else:
@@ -65,7 +65,7 @@ class ControllerTarefas:
         # pega a tarefa a ser excluída
         tarefa_selecionada = self.pegar_tarefa_para_realizar_operacao()
         if not tarefa_selecionada:
-            return self.excluir_tarefa()
+            return
 
         # deleta tarefa do banco
         deletado = self.repo_tarefa.excluir_tarefa(tarefa_selecionada)
@@ -78,7 +78,7 @@ class ControllerTarefas:
         # pega a tarefa a ser finalizada
         tarefa_selecionada = self.pegar_tarefa_para_realizar_operacao()
         if not tarefa_selecionada:
-            return self.finalizar_tarefa()
+            return
 
         # altera as informações no banco para demostrar a finalização da tarefa
         finalizada = self.repo_tarefa.finalizar_tarefa(tarefa_selecionada)

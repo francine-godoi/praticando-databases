@@ -47,12 +47,12 @@ class RepositorioTarefa(AuxiliarDB):
 
         return resultado
 
-    def editar_tarefa(self, tarefa: Tarefa) -> int:
+    def editar_tarefa(self, novos_dados: dict) -> int:
 
         # trunk-ignore(bandit/B608)
         sql = f"""UPDATE {self.__NOME_TABELA} SET descricao = ?, importancia = ? WHERE id_tarefa = ? AND status = 'A'"""
 
-        info_tarefa = (tarefa.descricao, tarefa.importancia, tarefa.id_tarefa)
+        info_tarefa = (novos_dados['descricao'], novos_dados['importancia'], novos_dados['id_tarefa'])
         resultado = self.executar_sql(sql, info_tarefa, comitar=True).rowcount
         self.fechar_conexao()
 

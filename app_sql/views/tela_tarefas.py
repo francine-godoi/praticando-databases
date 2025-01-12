@@ -79,7 +79,7 @@ class TelaTarefas:
         try:  # verifica se id digitado é um número
             id_tarefa = int(id_tarefa)
         except ValueError:
-            print("Id inválido.")
+            self.mostrar_mensagem("Id inválido.")
             return 0
         return int(id_tarefa)
 
