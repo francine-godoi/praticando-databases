@@ -1,5 +1,4 @@
-from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError
 from models.usuarios import Usuario
 from repositories.conexao_db import ConexaoDb
 
@@ -27,11 +26,12 @@ class RepositorioUsuario:
             self.session.close()            
             return 0
 
-    def selecionar_usuario_por_username(self, username: str) -> Usuario | int:
-
-        try:
-            usuario = self.session.scalars(select(Usuario).where(Usuario.username==username)).one()
-            return usuario
-        except NoResultFound:
-            return 0
-
+    def selecionar_usuario_por_username(self, username: str) -> Usuario:
+        
+        usuario = (
+            self.session.query(Usuario).filter(
+                Usuario.username==username)
+                .first()
+        )
+        self.session.close()
+        return usuario

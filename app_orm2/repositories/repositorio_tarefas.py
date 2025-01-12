@@ -1,7 +1,7 @@
 from datetime import datetime
-from sqlalchemy import literal_column
 from models.tarefas import Tarefa
 from repositories.conexao_db import ConexaoDb
+from sqlalchemy import literal_column
 
 
 class RepositorioTarefa:
@@ -74,8 +74,11 @@ class RepositorioTarefa:
 
     def selecionar_todas_tarefas(self, id_usuario: int) -> list[Tarefa]:
         tarefas = (
-            self.session.query(Tarefa).filter(Tarefa.id_usuario == id_usuario).all()
+            self.session.query(Tarefa).filter(
+                Tarefa.id_usuario == id_usuario)
+                .all()
         )
+        self.session.close()
         return tarefas
 
     def selecionar_tarefa_por_id(self, id_tarefa: int, id_usuario: int) -> Tarefa:
@@ -86,6 +89,7 @@ class RepositorioTarefa:
                 Tarefa.status == 'A')
                 .first()
         )
+        self.session.close()
         return tarefa
         
     def selecionar_tarefas_por_status(
@@ -98,6 +102,7 @@ class RepositorioTarefa:
                 Tarefa.status == status)
                 .all()
         )
+        self.session.close()
         return tarefas
     
     def selecionar_tarefas_por_importancia(
@@ -110,6 +115,7 @@ class RepositorioTarefa:
                 Tarefa.importancia == importancia)
                 .all()
         )
+        self.session.close()
         return tarefas
         
 
@@ -120,8 +126,9 @@ class RepositorioTarefa:
         tarefas = (
             self.session.query(Tarefa).filter(
                 Tarefa.id_usuario == id_usuario,
-                literal_column(tipo_data)>=data_inicio,
-                literal_column(tipo_data)<=data_final)
+                literal_column(tipo_data) >= data_inicio,
+                literal_column(tipo_data) <= data_final)
                 .all()
         )
+        self.session.close()
         return tarefas
