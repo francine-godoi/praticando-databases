@@ -10,8 +10,6 @@ class RepositorioTarefa(AuxiliarDB):
     __FOREIGN_TABELA = "usuarios"
 
     def __init__(self) -> None:
-        self.conexao = None
-        self.cursor = None
         self.criar_tabela_tarefas()
 
     def criar_tabela_tarefas(self) -> None:
@@ -49,7 +47,6 @@ class RepositorioTarefa(AuxiliarDB):
 
     def editar_tarefa(self, novos_dados: dict) -> int:
 
-        # trunk-ignore(bandit/B608)
         sql = f"""UPDATE {self.__NOME_TABELA} SET descricao = ?, importancia = ? WHERE id_tarefa = ? AND status = 'A'"""
 
         info_tarefa = (novos_dados['descricao'], novos_dados['importancia'], novos_dados['id_tarefa'])
@@ -61,7 +58,6 @@ class RepositorioTarefa(AuxiliarDB):
     def excluir_tarefa(self, tarefa: Tarefa) -> int:
 
         sql = (
-            # trunk-ignore(bandit/B608)
             f"""DELETE FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A'"""
         )
 
@@ -72,7 +68,6 @@ class RepositorioTarefa(AuxiliarDB):
 
     def finalizar_tarefa(self, tarefa: Tarefa) -> int:
 
-        # trunk-ignore(bandit/B608)
         sql = f"""UPDATE {self.__NOME_TABELA} SET status = 'F', finalizado_em = ? WHERE id_tarefa = ? AND status = 'A'"""
 
         data = date.today().strftime("%d/%m/%Y")
@@ -85,7 +80,6 @@ class RepositorioTarefa(AuxiliarDB):
 
     def selecionar_todas_tarefas(self, id_usuario: int) -> list[Tarefa]:
 
-        # trunk-ignore(bandit/B608)
         sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? ORDER BY id_tarefa"""
 
         resultados = self.executar_sql(sql, (id_usuario,)).fetchall()
@@ -100,7 +94,6 @@ class RepositorioTarefa(AuxiliarDB):
     def selecionar_tarefa_por_id(self, id_tarefa: int, id_usuario: int) -> Tarefa:
         """retorna id_usuario, descricao, importancia, status"""
 
-        # trunk-ignore(bandit/B608)
         sql = f"""SELECT id_usuario, descricao, importancia, status, id_tarefa FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A' and id_usuario = ? ORDER BY id_tarefa"""
 
         resultado = self.executar_sql(sql, (id_tarefa, id_usuario)).fetchone()
@@ -118,7 +111,6 @@ class RepositorioTarefa(AuxiliarDB):
     ) -> list[Tarefa]:
         """retorna id_tarefa, descricao, importancia"""
 
-        # trunk-ignore(bandit/B608)
         sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND status = ? ORDER BY id_tarefa"""
 
         resultados = self.executar_sql(sql, (id_usuario, status)).fetchall()
@@ -135,7 +127,6 @@ class RepositorioTarefa(AuxiliarDB):
     ) -> list[Tarefa]:
         """retorna id_tarefa, descricao, importancia, status, criado_em, finalizado_em"""
 
-        # trunk-ignore(bandit/B608)
         sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND importancia = ? ORDER BY id_tarefa"""
 
         resultados = self.executar_sql(sql, (id_usuario, importancia)).fetchall()
@@ -152,7 +143,6 @@ class RepositorioTarefa(AuxiliarDB):
     ) -> list[Tarefa]:
         """retorna id_tarefa, descricao, importancia, status, criado_em, finalizado_em"""
 
-        # trunk-ignore(bandit/B608)
         sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND {tipo_data} >= ? AND {tipo_data} <= ? ORDER BY id_tarefa"""
 
         resultados = self.executar_sql(

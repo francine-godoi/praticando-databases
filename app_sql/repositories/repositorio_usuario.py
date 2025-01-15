@@ -9,8 +9,6 @@ class RepositorioUsuario(AuxiliarDB):
     __NOME_TABELA = "usuarios"
 
     def __init__(self) -> None:
-        self.conexao = None
-        self.cursor = None
         self.criar_tabela_usuario()
 
     def criar_tabela_usuario(self) -> None:
@@ -26,7 +24,6 @@ class RepositorioUsuario(AuxiliarDB):
 
     def cadastrar_usuario(self, usuario: Usuario) -> int:
 
-        # trunk-ignore(bandit/B608)
         sql = f"""INSERT INTO {self.__NOME_TABELA} (username, senha, salt) VALUES (?,?,?)"""
 
         info_usuario = (usuario.username, usuario.senha, usuario.salt)
@@ -40,7 +37,6 @@ class RepositorioUsuario(AuxiliarDB):
 
     def selecionar_usuario_por_username(self, username: str) -> Usuario | int:
 
-        # trunk-ignore(bandit/B608)
         sql = f"""SELECT * FROM {self.__NOME_TABELA} WHERE username = ?"""
 
         resultado = self.executar_sql(sql, (username,)).fetchone()
