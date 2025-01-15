@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 def pegar_senha_tratada(salt: bytes, senha: str) -> bool | bytes:
 
+    #TODO não receber a mensagem de erro quando a senha é fraca na tentativa de login
     if not is_senha_forte(senha):
         print(
             "A senha deve conter pelo menos 8 caracteres, incluindo:\nletras maiúsculas, minúsculas, números e caracteres especiais\n"

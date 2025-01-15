@@ -1,20 +1,27 @@
-from sqlalchemy import Column, Integer, String
-from utils.conexao_db import Base
+from typing import List
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from repositories.conexao_db import ConexaoDb
 
+Base = ConexaoDb().pegar_base()
 
 class Usuario(Base):
 
     __tablename__ = "usuarios"
 
-    id_usuario = Column("id_usuario", Integer, primary_key=True)
-    username = Column("username", String, nullable=False, unique=True)
-    senha = Column("senha", String, nullable=False)
-    salt = Column("salt", String, nullable=False)
+    id_usuario: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(nullable=False, unique=True)
+    senha: Mapped[str] = mapped_column(nullable=False)
+    salt: Mapped[str] = mapped_column(nullable=False)
 
-    def __init__(self, username: str, senha: str, salt: str):
+    tarefas: Mapped[List["Tarefa"]] = relationship(back_populates='usuario')
+
+    def __init__(
+        self, username: str, senha: str, salt: str, id_usuario: int = None
+    ) -> None:
         self.username = username
         self.senha = senha
         self.salt = salt
+        self.id_usuario = id_usuario
 
-    def pegar_info_usuario(self) -> tuple:
-        return (self.username, self.senha, self.salt)
+    def __repr__(self) -> str:
+        return f"Username: {self.username}, Senha: {self.senha}, Salt: {self.salt}"

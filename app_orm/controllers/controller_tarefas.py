@@ -1,228 +1,169 @@
-from datetime import datetime
-
 from models.tarefas import Tarefa
-from utils.conexao_db import session
+from repositories.repositorio_tarefas import RepositorioTarefa
 from views.tela_tarefas import TelaTarefas
 
 
 class ControllerTarefas:
 
-    def __init__(self, usuario: int):
-        self.id_usuario = usuario
+    def __init__(self, id_usuario: int) -> None:
+        # Vincula a tarefa com o usuário logado
+        self.id_usuario = id_usuario
+        self.repo_tarefa = RepositorioTarefa()
         self.tela_tarefas = TelaTarefas()
 
     def adicionar_tarefa(self) -> None:
-        descricao = input("Descrição: ").strip()
-        if descricao == "":
-            print("Descrição não pode ficar em branco.\n")
+        # chama o método que coleta as informações do usuário
+        descricao, importancia = (
+            self.tela_tarefas.pegar_informacoes_para_adicionar_tarefa()
+        )
+        if not descricao:
             return self.adicionar_tarefa()
 
-        importancia = ""
-        while importancia not in ("A", "M", "B"):
-            importancia = (
-                input("Importância (A = Alta, M = Média, B = Baixa): ").strip().upper()
-            )
+        nova_tarefa = Tarefa(self.id_usuario, descricao, importancia)
 
-        tarefa = Tarefa(
-            self.id_usuario,
-            descricao,
-            importancia,
-            datetime.today().strftime("%d/%m/%Y"),
-        )
-        try:
-            session.add(tarefa)
-            session.commit()
-            print("Tarefa cadastrada com sucesso.\n")
-        except Exception as e:
-            session.rollback()
-            print(f"Não foi possível cadastrar a tarefa. Um erro ocorreu: {e}\n")
+        # salva os dados no banco
+        cadastrado = self.repo_tarefa.adicionar_tarefa(nova_tarefa)
+        if cadastrado:
+            self.tela_tarefas.mostrar_mensagem("Tarefa cadastrada com sucesso.")
+        else:
+            self.tela_tarefas.mostrar_mensagem("Não foi possível cadastrar a tarefa.")
 
     def editar_tarefa(self) -> None:
-        if not self.existe_tarefas_andamento():
+        # pega a tarefa a ser editada
+        tarefa_selecionada = self.pegar_tarefa_para_realizar_operacao()
+        if not tarefa_selecionada:
             return
 
-        self.motrar_tarefas_andamento()
-
-        tarefa_selecionada = self.selecionar_tarefa_por_id()
-        if tarefa_selecionada == 0:  # id inválida
-            return self.editar_tarefa()
-
-        print("\nInformações atuais: ")
-        print(
-            f"Descrição: {tarefa_selecionada.descricao} - Importância: {tarefa_selecionada.importancia}\n"
+        # pega novas informações com usuário
+        nova_descricao, nova_importancia = (
+            self.tela_tarefas.pegar_informacoes_para_editar_tarefa(tarefa_selecionada)
         )
 
-        descricao = input("Nova descrição: (Aperte Enter para não modificar): ")
+        # se usuário pressionou enter as informação permanecem sem alteração
+        if nova_descricao == "":
+            nova_descricao = tarefa_selecionada.descricao
 
-        importancia = None
-        while importancia not in ("A", "M", "B", ""):
-            importancia = input(
-                "Importância: (A = Alta, M = Média, B = Baixa): (Aperte Enter para não modificar) "
-            ).upper()
+        if nova_importancia == "":
+            nova_importancia = tarefa_selecionada.importancia
 
-        if descricao != "":
-            tarefa_selecionada.descricao = descricao
+        # cria uma tarefa com as informações editadas
+        novos_dados = {
+            'id_usuario': self.id_usuario,
+            'descricao': nova_descricao,
+            'importancia': nova_importancia,
+            'id_tarefa': tarefa_selecionada.id_tarefa,
+        }
 
-        if importancia != "":
-            tarefa_selecionada.importancia = importancia
-
-        try:
-            session.add(tarefa_selecionada)
-            session.commit()
-            print("Tarefa editada com sucesso!\n")
-        except Exception as e:
-            session.rollback()
-            print(f"Não foi possível editar a tarefa. Um erro ocorreu: {e}\n")
+        # salva a edição no banco
+        editado = self.repo_tarefa.editar_tarefa(novos_dados)
+        if editado:
+            self.tela_tarefas.mostrar_mensagem("Tarefa editada com sucesso!")
+        else:
+            self.tela_tarefas.mostrar_mensagem("Não foi possível editar a tarefa.")
 
     def excluir_tarefa(self) -> None:
-        if not self.existe_tarefas_andamento():
+        # pega a tarefa a ser excluída
+        tarefa_selecionada = self.pegar_tarefa_para_realizar_operacao()
+        if not tarefa_selecionada:
             return
 
-        self.motrar_tarefas_andamento()
-
-        tarefa_selecionada = self.selecionar_tarefa_por_id()
-        if tarefa_selecionada == 0:  # id inválida
-            return self.excluir_tarefa()
-
-        try:
-            session.delete(tarefa_selecionada)
-            session.commit()
-            print("Tarefa excluida com sucesso.\n")
-        except Exception as e:
-            session.rollback()
-            print(f"Não foi possível excluir a tarefa. Um erro ocorreu: {e}\n")
+        # deleta tarefa do banco
+        deletado = self.repo_tarefa.excluir_tarefa(tarefa_selecionada)
+        if deletado:
+            self.tela_tarefas.mostrar_mensagem("Tarefa excluída com sucesso.")
+        else:
+            self.tela_tarefas.mostrar_mensagem("Não foi possível excluir a tarefa.")
 
     def finalizar_tarefa(self) -> None:
-        if not self.existe_tarefas_andamento():
+        # pega a tarefa a ser finalizada
+        tarefa_selecionada = self.pegar_tarefa_para_realizar_operacao()
+        if not tarefa_selecionada:
             return
 
-        self.motrar_tarefas_andamento()
+        # altera as informações no banco para demostrar a finalização da tarefa
+        finalizada = self.repo_tarefa.finalizar_tarefa(tarefa_selecionada)
+        if finalizada:
+            self.tela_tarefas.mostrar_mensagem("Tarefa finalizada com sucesso.")
+        else:
+            self.tela_tarefas.mostrar_mensagem("Não foi possível finalizar a tarefa.")
 
-        tarefa_selecionada = self.selecionar_tarefa_por_id()
-        if tarefa_selecionada == 0:  # id inválida
-            return self.finalizar_tarefa()
+    def pegar_tarefa_para_realizar_operacao(self) -> Tarefa | int:
+        # só é possível realizar operações (editar,excluir,finalizar) em tarefas em andamento
+        if not self.existe_tarefas_em_andamento():
+            return 0
 
-        tarefa_selecionada.finalizado_em = datetime.today().strftime("%d/%m/%Y")
-        tarefa_selecionada.status = "F"
-        try:
-            session.add(tarefa_selecionada)
-            session.commit()
-            print("Tarefa finalizada com sucesso.\n")
-        except Exception as e:
-            session.rollback()
-            print(f"Não foi possível  finalizar a tarefa. Um erro ocorreu: {e}\n")
+        # pega as tarefas do usuário disponíveis para operação
+        tarefas = self.repo_tarefa.selecionar_tarefas_por_status(self.id_usuario, "A")
+        # envia tarefas disponíveis e pega o id da tarefa desejada com o usuário
+        id_tarefa = self.tela_tarefas.pegar_id_tarefa_para_realizar_operacao(tarefas)
+        if not id_tarefa:
+            return 0
 
-    def existe_tarefas_andamento(self) -> bool:
-        tarefas = (
-            session.query(Tarefa)
-            .filter(Tarefa.id_usuario == self.id_usuario)
-            .where(Tarefa.status == "A")
-            .all()
+        # busca a tarefa no banco pelo id selecionado, já verificando se ela pertence ao usuário
+        tarefa_selecionada = self.repo_tarefa.selecionar_tarefa_por_id(
+            id_tarefa, self.id_usuario
         )
-        if not tarefas:
-            print("Usuario não tem tarefas para realizar a operação.\n")
-            return False
-        return True
-
-    def motrar_tarefas_andamento(self) -> None:
-        opcao = ""
-        while opcao not in ("S", "N"):
-            opcao = input("Deseja ver as tarefas em andamento? S/N ").strip().upper()
-
-        if opcao == "S":
-            tarefas = (
-                session.query(Tarefa)
-                .filter(Tarefa.id_usuario == self.id_usuario)
-                .where(Tarefa.status == "A")
-                .all()
-            )
-            for tarefa in tarefas:
-                print(
-                    f"Id: {tarefa.id_tarefa} - Descrição: {tarefa.descricao} - Importância: {tarefa.importancia}"
-                )
-
-    def selecionar_tarefa_por_id(self) -> int | Tarefa:
-        id_tarefa = input("Qual o id da tarefa? ")
-        tarefa_selecionada = (
-            session.query(Tarefa)
-            .filter(Tarefa.id_tarefa == id_tarefa)
-            .where(Tarefa.status == "A")
-            .where(Tarefa.id_usuario == self.id_usuario)
-            .first()
-        )
-
         if not tarefa_selecionada:
-            print("Não foi possível selecionar a tarefa. Favor verificar a lista.\n")
+            self.tela_tarefas.mostrar_mensagem(
+                "Não foi possível selecionar a tarefa. Favor consultar a tabela."
+            )
             return 0
 
         return tarefa_selecionada
 
-    def listar_todas_tarefas(self) -> None:
-        tarefas = (
-            session.query(Tarefa).filter(Tarefa.id_usuario == self.id_usuario).all()
-        )
+    def existe_tarefas_em_andamento(self) -> bool:
+        # verifica se o usuário tem tarefas com status 'A' = Andamento
+        tarefas = self.repo_tarefa.selecionar_tarefas_por_status(self.id_usuario, "A")
         if not tarefas:
-            print("Nenhuma tarefa encontrada.\n")
+            self.tela_tarefas.mostrar_mensagem(
+                "Usuário não tem tarefas para realizar a operação."
+            )
+            return False
+        return True
+
+    def listar_todas_tarefas(self) -> None:
+        # pega todas as tarefas do usuário e envia para a view para exibição
+        tarefas = self.repo_tarefa.selecionar_todas_tarefas(self.id_usuario)
+        if not tarefas:
+            self.tela_tarefas.mostrar_mensagem("Nenhuma tarefa encontrada.")
             return
         self.tela_tarefas.exibir_tarefas(tarefas)
 
     def listar_tarefas_por_status(self, tipo_status: str) -> None:
-        tarefas = (
-            session.query(Tarefa)
-            .filter(Tarefa.id_usuario == self.id_usuario)
-            .where(Tarefa.status == tipo_status)
-            .all()
+        """Tipo status: 'A' = Andamento ou 'F' = Finalizado."""
+        # pega as tarefas do usuário conforme status selecionado e envia para a view para exibição
+        tarefas = self.repo_tarefa.selecionar_tarefas_por_status(
+            self.id_usuario, tipo_status
         )
         if not tarefas:
-            print("Nenhuma tarefa encontrada.\n")
+            self.tela_tarefas.mostrar_mensagem("Nenhuma tarefa encontrada.")
             return
         self.tela_tarefas.exibir_tarefas(tarefas)
 
     def listar_tarefas_por_importancia(self) -> None:
-        importancia = None
-        while importancia not in ("A", "M", "B"):
-            importancia = input(
-                "Importância: (A = Alta, M = Média, B = Baixa): "
-            ).upper()
-
-        tarefas = (
-            session.query(Tarefa)
-            .filter(Tarefa.id_usuario == self.id_usuario)
-            .where(Tarefa.importancia == importancia)
-            .all()
+        # pede para o usuário escolher a importância das tarefas que deseja visualizar
+        importancia = self.tela_tarefas.pegar_importancia_para_filtragem()
+        # pega as tarefas do usuário conforme importância selecionada e envia para a view para exibição
+        tarefas = self.repo_tarefa.selecionar_tarefas_por_importancia(
+            self.id_usuario, importancia
         )
         if not tarefas:
-            print("Nenhuma tarefa encontrada.\n")
+            self.tela_tarefas.mostrar_mensagem("Nenhuma tarefa encontrada.")
             return
         self.tela_tarefas.exibir_tarefas(tarefas)
 
     def listar_tarefas_por_data(self, tipo_data: str) -> None:
-        data_inicial = input("Data Inicial (dd/mm/aaaa): ").strip()
-        data_final = input("Data Final (dd/mm/aaaa): ").strip()
-
-        try:
-            datetime.strptime(data_inicial, "%d/%m/%Y")
-            datetime.strptime(data_final, "%d/%m/%Y")
-        except ValueError:
-            print("Data no formato errado. Tente novamente.\n")
+        """Tipo data = 'criado_em' ou 'finalizado_em'."""
+        # pede para o usuário escolher as datas para filtragem
+        data_inicial, data_final = self.tela_tarefas.pegar_datas_para_filtragem()
+        if not data_inicial or not data_final:
             return self.listar_tarefas_por_data(tipo_data)
 
-        if tipo_data == "criado_em":
-            tarefas = (
-                session.query(Tarefa)
-                .filter(Tarefa.id_usuario == self.id_usuario)
-                .where(Tarefa.criado_em >= data_inicial)
-                .where(Tarefa.criado_em <= data_final)
-            )
-        elif tipo_data == "finalizado_em":
-            tarefas = (
-                session.query(Tarefa)
-                .filter(Tarefa.id_usuario == self.id_usuario)
-                .where(Tarefa.finalizado_em >= data_inicial)
-                .where(Tarefa.finalizado_em <= data_final)
-            )
-
+        # pega as tarefas do usuário entre as datas escolhidas e envia para a view para exibição
+        tarefas = self.repo_tarefa.selecionar_tarefas_por_data(
+            tipo_data, self.id_usuario, data_inicial, data_final
+        )
         if not tarefas:
-            print("Nenhuma tarefa encontrada.\n")
+            self.tela_tarefas.mostrar_mensagem("Nenhuma tarefa encontrada.")
             return
         self.tela_tarefas.exibir_tarefas(tarefas)
