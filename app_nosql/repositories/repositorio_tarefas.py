@@ -1,171 +1,100 @@
 from datetime import date
-
 from models.tarefas import Tarefa
-#from repositories.auxiliar_db import AuxiliarDB
+from repositories.conexao_db import ConexaoDb
 
 
 class RepositorioTarefa():
 
-    __NOME_TABELA = "tarefas"
-    __FOREIGN_TABELA = "usuarios"
 
     def __init__(self) -> None:
-        self.criar_tabela_tarefas()
+        self.db = ConexaoDb.pegar_db()
+        self.collection_tarefa = self.criar_tabela_tarefas()
 
     def criar_tabela_tarefas(self) -> None:
-
-        sql = f"""CREATE TABLE IF NOT EXISTS {self.__NOME_TABELA} (
-                    id_tarefa INTEGER PRIMARY KEY,
-                    id_usuario INTEGER,
-                    descricao TEXT NOT NULL,
-                    importancia TEXT NOT NULL,
-                    status TEXT NOT NULL,
-                    criado_em TEXT NOT NULL,
-                    finalizado_em TEXT,
-                    FOREIGN KEY (id_usuario) REFERENCES {self.__FOREIGN_TABELA} (id_usuario)
-        )"""
-
-        self.executar_sql(sql)
-        self.fechar_conexao()
+        collection_tarefa = self.db.tarefas
+        return collection_tarefa
 
     def adicionar_tarefa(self, tarefa: Tarefa) -> int:
-
-        sql = f"""INSERT INTO {self.__NOME_TABELA} (id_usuario, descricao, importancia, status, criado_em) VALUES(?,?,?,?,?)"""
-
+        ultimo_registro = self.collection_tarefa.find_one(sort=[('$natural', -1)])
         data = date.today().strftime("%d/%m/%Y")
-        info_tarefa = (
-            tarefa.id_usuario,
-            tarefa.descricao,
-            tarefa.importancia,
-            "A",
-            data,
-        )
-        resultado = self.executar_sql(sql, info_tarefa, comitar=True).rowcount
-        self.fechar_conexao()
-
+        info_tarefa = {
+            'id_usuario': tarefa.id_usuario,
+            'descricao': tarefa.descricao,
+            'importancia': tarefa.importancia,
+            'status': "A",
+            'criado_em': data,
+            'finalizado_em': '',
+            'id_tarefa': ultimo_registro['id_tarefa'] + 1 if ultimo_registro else 1
+            }
+        
+        resultado = self.collection_tarefa.insert_one(info_tarefa).inserted_id
         return resultado
 
-    def editar_tarefa(self, novos_dados: dict) -> int:
-
-        sql = f"""UPDATE {self.__NOME_TABELA} SET descricao = ?, importancia = ? WHERE id_tarefa = ? AND status = 'A'"""
-
-        info_tarefa = (novos_dados['descricao'], novos_dados['importancia'], novos_dados['id_tarefa'])
-        resultado = self.executar_sql(sql, info_tarefa, comitar=True).rowcount
-        self.fechar_conexao()
-
+    def editar_tarefa(self, novos_dados: dict) -> int:        
+        filtro = {'id_tarefa': novos_dados['id_tarefa']}
+        novos_dados = {'$set': {'descricao': novos_dados['descricao'],
+                                'importancia': novos_dados['importancia']}
+                      }
+        resultado = self.collection_tarefa.update_one(filtro, novos_dados).matched_count
         return resultado
 
     def excluir_tarefa(self, tarefa: Tarefa) -> int:
-
-        sql = (
-            f"""DELETE FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A'"""
-        )
-
-        resultado = self.executar_sql(sql, (tarefa.id_tarefa,), comitar=True).rowcount
-        self.fechar_conexao()
-
+        filtro = {'id_tarefa': tarefa.id_tarefa}
+        resultado = self.collection_tarefa.delete_one(filtro).deleted_count
         return resultado
 
     def finalizar_tarefa(self, tarefa: Tarefa) -> int:
-
-        sql = f"""UPDATE {self.__NOME_TABELA} SET status = 'F', finalizado_em = ? WHERE id_tarefa = ? AND status = 'A'"""
-
+        filtro = {'id_tarefa': tarefa.id_tarefa}
         data = date.today().strftime("%d/%m/%Y")
-        resultado = self.executar_sql(
-            sql, (data, tarefa.id_tarefa), comitar=True
-        ).rowcount
-        self.fechar_conexao()
-
+        novos_dados = {'$set': {'status': 'F',
+                                'finalizado_em': data}
+                      }
+        resultado = self.collection_tarefa.update_one(filtro, novos_dados).matched_count
         return resultado
 
     def selecionar_todas_tarefas(self, id_usuario: int) -> list[Tarefa]:
-
-        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? ORDER BY id_tarefa"""
-
-        resultados = self.executar_sql(sql, (id_usuario,)).fetchall()
-        self.fechar_conexao()
-
-        lista_tarefas = lista_tarefas = self.criar_lista_de_tarefas(
-            id_usuario, resultados
-        )
-
+        resultados = self.collection_tarefa.find({'id_usuario': id_usuario})
+        lista_tarefas = self.criar_lista_de_tarefas(resultados)
         return lista_tarefas
 
     def selecionar_tarefa_por_id(self, id_tarefa: int, id_usuario: int) -> Tarefa:
-        """retorna id_usuario, descricao, importancia, status"""
-
-        sql = f"""SELECT id_usuario, descricao, importancia, status, id_tarefa FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A' and id_usuario = ? ORDER BY id_tarefa"""
-
-        resultado = self.executar_sql(sql, (id_tarefa, id_usuario)).fetchone()
-        self.fechar_conexao()
-
+        resultado = self.collection_tarefa.find_one({'id_usuario': id_usuario, 'id_tarefa': id_tarefa, 'status': 'A'})
         if not resultado:
             return 0
 
-        tarefa = Tarefa(id_usuario, resultado[1], resultado[2], id_tarefa)
-
+        tarefa = Tarefa(resultado['id_usuario'], resultado['descricao'], resultado['importancia'], resultado['id_tarefa'])
         return tarefa
 
-    def selecionar_tarefas_por_status(
-        self, id_usuario: int, status: str
-    ) -> list[Tarefa]:
-        """retorna id_tarefa, descricao, importancia"""
-
-        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND status = ? ORDER BY id_tarefa"""
-
-        resultados = self.executar_sql(sql, (id_usuario, status)).fetchall()
-        self.fechar_conexao()
-
-        lista_tarefas = lista_tarefas = self.criar_lista_de_tarefas(
-            id_usuario, resultados
-        )
-
+    def selecionar_tarefas_por_status(self, id_usuario: int, status: str) -> list[Tarefa]:
+        resultados = self.collection_tarefa.find({'id_usuario': id_usuario, 'status': status})
+        lista_tarefas = self.criar_lista_de_tarefas(resultados)
         return lista_tarefas
 
-    def selecionar_tarefas_por_importancia(
-        self, id_usuario: int, importancia: str
-    ) -> list[Tarefa]:
-        """retorna id_tarefa, descricao, importancia, status, criado_em, finalizado_em"""
-
-        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND importancia = ? ORDER BY id_tarefa"""
-
-        resultados = self.executar_sql(sql, (id_usuario, importancia)).fetchall()
-        self.fechar_conexao()
-
-        lista_tarefas = lista_tarefas = self.criar_lista_de_tarefas(
-            id_usuario, resultados
-        )
-
+    def selecionar_tarefas_por_importancia(self, id_usuario: int, importancia: str) -> list[Tarefa]:     
+        resultados = self.collection_tarefa.find({'id_usuario': id_usuario, 'importancia': importancia})
+        lista_tarefas = self.criar_lista_de_tarefas(resultados)
         return lista_tarefas
 
     def selecionar_tarefas_por_data(
-        self, tipo_data: str, id_usuario: int, data_inicio: str, data_final: str
-    ) -> list[Tarefa]:
-        """retorna id_tarefa, descricao, importancia, status, criado_em, finalizado_em"""
-
-        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND {tipo_data} >= ? AND {tipo_data} <= ? ORDER BY id_tarefa"""
-
-        resultados = self.executar_sql(
-            sql, (id_usuario, data_inicio, data_final)
-        ).fetchall()
-        self.fechar_conexao()
-
-        lista_tarefas = self.criar_lista_de_tarefas(id_usuario, resultados)
-
+        #FIX resolver a situação das datas
+        self, tipo_data: str, id_usuario: int, data_inicio: str, data_final: str) -> list[Tarefa]:   
+        resultados = self.collection_tarefa.find({'id_usuario': id_usuario,
+                                                  tipo_data:{'$gte': data_inicio},
+                                                  tipo_data: {'$lte': data_final}})
+        lista_tarefas = self.criar_lista_de_tarefas(resultados)
         return lista_tarefas
 
-    def criar_lista_de_tarefas(self, id_usuario, resultados) -> list[Tarefa]:
+    def criar_lista_de_tarefas(self, resultados) -> list[Tarefa]:
         lista_tarefas = []
         for resultado in resultados:
             tarefa = Tarefa(
-                id_usuario = id_usuario,
-                id_tarefa = resultado[0],
-                descricao = resultado[1],
-                importancia = resultado[2],
-                status = resultado[3],
-                criado_em = resultado[4],
-                finalizado_em = resultado[5],
+                id_usuario = resultado['id_usuario'],
+                id_tarefa = resultado['id_tarefa'],
+                descricao = resultado['descricao'],
+                importancia = resultado['importancia'],
+                status = resultado['status'],
+                criado_em = resultado['criado_em'],
+                finalizado_em = resultado['finalizado_em'],
             )
             lista_tarefas.append(tarefa)
-
         return lista_tarefas

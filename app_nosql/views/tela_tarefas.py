@@ -49,6 +49,7 @@ class TelaTarefas:
 
     def pegar_informacoes_para_editar_tarefa(self, tarefa_selecionada: Tarefa) -> tuple:
         # mostra informações atuais para comparação
+        print(tarefa_selecionada)
         print("\nInformações atuais: ")
         print(
             f"Descrição: {tarefa_selecionada.descricao} - Importância: {tarefa_selecionada.importancia}\n"
