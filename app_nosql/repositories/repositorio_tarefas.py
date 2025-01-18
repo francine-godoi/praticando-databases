@@ -1,6 +1,6 @@
 from datetime import date
 from models.tarefas import Tarefa
-from repositories.conexao_db import ConexaoDb
+from database.conexao_db import ConexaoDb
 
 
 class RepositorioTarefa():
@@ -75,12 +75,15 @@ class RepositorioTarefa():
         lista_tarefas = self.criar_lista_de_tarefas(resultados)
         return lista_tarefas
 
-    def selecionar_tarefas_por_data(
-        #FIX resolver a situação das datas
-        self, tipo_data: str, id_usuario: int, data_inicio: str, data_final: str) -> list[Tarefa]:   
+    def selecionar_tarefas_por_data(self, tipo_data: str, id_usuario: int,
+                                    data_inicio: str, data_final: str) -> list[Tarefa]:   
+
         resultados = self.collection_tarefa.find({'id_usuario': id_usuario,
-                                                  tipo_data:{'$gte': data_inicio},
-                                                  tipo_data: {'$lte': data_final}})
+                                                  '$and': [
+                                                        {tipo_data:{'$gte': data_inicio}},
+                                                        {tipo_data:{'$lte': data_final}}
+                                                    ]
+                                                })
         lista_tarefas = self.criar_lista_de_tarefas(resultados)
         return lista_tarefas
 

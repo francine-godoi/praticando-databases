@@ -1,4 +1,4 @@
-from repositories.conexao_db import ConexaoDb
+from database.conexao_db import ConexaoDb
 from models.usuarios import Usuario
 
 
@@ -13,7 +13,6 @@ class RepositorioUsuario():
         return collection_usuario
 
     def cadastrar_usuario(self, usuario: Usuario) -> int:
-        #TODO username tem que ser unico
         info_usuario = {
             'username': usuario.username,
             'senha': usuario.senha,

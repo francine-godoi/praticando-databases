@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from config import CONNECTION_STRING
 
 class ConexaoDb:
 
@@ -7,8 +8,7 @@ class ConexaoDb:
 
     @classmethod
     def criar_conexao(cls):
-        connection_string = "mongodb://localhost:27017/"
-        client = MongoClient(connection_string)
+        client = MongoClient(CONNECTION_STRING)
         return client
 
     @classmethod
