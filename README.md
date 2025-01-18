@@ -8,8 +8,8 @@ Segundo mini projeto (via terminal) aplicando conceitos vistos durante minha jor
     2. POO
     3. MVC
     4. Sql puro (Sqlite)
-    5. SqlAlchemy ORM
-    6. NoSql (MongoDB) - futuramente
+    5. ORM (SqlAlchemy)
+    6. NoSql (MongoDB)
 
 ---
 
@@ -21,14 +21,15 @@ Resolvi então a juntar esse projeto com a "lista de tarefas" que é um dos proj
 
 Outra vantagem de juntar os dois projetos é que agora terei duas tabelas relacionadas para trabalhar com o banco de dados, coisa que não seria possível apenas com o sistema de login.
 
-Para melhor aproveitar e treinar os conhecimentos que adquiri até o momento resolvi criar duas versões desse projeto:
+Para melhor aproveitar e treinar os conhecimentos que adquiri até o momento resolvi criar três versões desse projeto:
 
 1. Usando Sql puro
 2. Usando o SqlAlchemy ORM
+3. Usando NoSql MongoDB
 
-Dessa forma também posso ver por conta própria a diferença na implementação dos dois.
+Dessa forma também posso ver por conta própria a diferença na implementação de cada.
 
-Futuramente, considero a possibilidade de criar uma terceira versão do sistema usando NoSql, já que também estudei MongoDB e portanto devo pratica-lo.
+Ao finalizar, criei uma quarta versão 'tudo em um', onde é possível selecionar qual versão vai ser rodada a partir do arquivo de configuração.
 
 ---
 
@@ -87,12 +88,15 @@ By Gurpreet Kaur](https://www.askpython.com/python/examples/storing-retrieving-p
 
 [Como Criar Banco de Dados em Python SQLAlchemy por Hashtag Programação](https://www.youtube.com/watch?v=W-g6StRy1zY)
 
+[MongoDB Python Tutorial by Tech With Tim](https://www.youtube.com/playlist?list=PLzMcBGfZo4-nX-NCYorkatzBxjqRlPkKB)
+
 ---
 
 ## 🛠️ Requerimentos
 
     `pip install python-dotenv`
     `pip install sqlalchemy`
+    `pip install pymongo`
 
 Criar um arquivo .env e armazenar a variável "PEPPER" que será usada no hash das senhas durante o cadastro do usuário.
 
