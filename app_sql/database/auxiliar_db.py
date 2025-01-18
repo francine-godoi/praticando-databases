@@ -1,4 +1,4 @@
-from repositories.conexao_db import ConexaoDB
+from database.conexao_db import ConexaoDB
 
 class AuxiliarDB():
     
