@@ -1,7 +1,7 @@
 from utils.auxiliar_senhas import gerar_salt, pegar_senha_tratada
 from views.tela_usuario import TelaUsuario
 
-from utils.importador_classe_dinamico import model_usuario as Usuario
+from models.usuarios import Usuario
 from utils.importador_classe_dinamico import repo_usuario as RepositorioUsuario
 
 class ControllerUsuarios:
@@ -22,6 +22,8 @@ class ControllerUsuarios:
         salt = gerar_salt()
         hashed_senha = pegar_senha_tratada(salt, senha)
         if not hashed_senha:
+            self.tela_usuario.mostrar_mensagem(
+            "A senha deve conter pelo menos 8 caracteres, incluindo:\nletras maiúsculas, minúsculas, números e caracteres especiais."        )
             return self.cadastrar_usuario()
 
         novo_usuario = Usuario(username, hashed_senha, salt)
@@ -51,3 +53,6 @@ class ControllerUsuarios:
         else:
             self.tela_usuario.mostrar_mensagem("Usuário ou Senha Inválidos.")
             return 0
+
+    def existe_username(self, username):
+        return self.repo_usuario.selecionar_usuario_por_username(username)

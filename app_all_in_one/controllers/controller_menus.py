@@ -2,7 +2,7 @@ from controllers.controller_tarefas import ControllerTarefas
 from controllers.controller_usuarios import ControllerUsuarios
 from views.tela_inicial import TelaInicial
 from views.tela_tarefas import TelaTarefas
-from utils.importador_classe_dinamico import model_usuario as Usuario
+from models.usuarios import Usuario
 
 
 class ControllerMenus:

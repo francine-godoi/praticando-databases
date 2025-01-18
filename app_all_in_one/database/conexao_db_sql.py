@@ -1,12 +1,11 @@
 import sqlite3
+from config import BANCO_DADOS
 
-class ConexaoDB:
-
-    BANCO_DADOS = "db/praticando_databases.db"
+class ConexaoDB():
 
     @classmethod
     def criar_conexao(cls):
-        with sqlite3.connect(cls.BANCO_DADOS) as conexao:
+        with sqlite3.connect(BANCO_DADOS) as conexao:
             return conexao
         
     

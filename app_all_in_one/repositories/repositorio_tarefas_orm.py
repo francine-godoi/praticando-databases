@@ -1,8 +1,8 @@
 from datetime import datetime
-from models.tarefas_orm import Tarefa
+from models.tarefas import Tarefa
 from database.conexao_db_orm import ConexaoDb
-from models.base import Base
 from sqlalchemy import literal_column
+from models.base import Base
 
 
 class RepositorioTarefa:
@@ -13,8 +13,7 @@ class RepositorioTarefa:
         self.criar_tabela_tarefas()
 
     def criar_tabela_tarefas(self) -> None:
-        self.Base = Base
-        self.Base.metadata.create_all(bind=self.conexao.db)
+        Base.metadata.create_all(bind=self.conexao.db)
 
     def adicionar_tarefa(self, tarefa: Tarefa) -> int:
         try:
@@ -117,8 +116,7 @@ class RepositorioTarefa:
                 .all()
         )
         self.session.close()
-        return tarefas
-        
+        return tarefas        
 
     def selecionar_tarefas_por_data(
         self, tipo_data: str, id_usuario: int, data_inicio: str, data_final: str

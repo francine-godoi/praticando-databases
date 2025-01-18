@@ -1,20 +1,19 @@
 from datetime import date
 
-from models.tarefas_sql import Tarefa
+from config import TABELA_TAREFAS, TABELA_USUARIOS
+from models.tarefas import Tarefa
 from database.auxiliar_db_sql import AuxiliarDB
 
 
 class RepositorioTarefa(AuxiliarDB):
 
-    __NOME_TABELA = "tarefas"
-    __FOREIGN_TABELA = "usuarios"
 
     def __init__(self) -> None:
         self.criar_tabela_tarefas()
 
     def criar_tabela_tarefas(self) -> None:
 
-        sql = f"""CREATE TABLE IF NOT EXISTS {self.__NOME_TABELA} (
+        sql = f"""CREATE TABLE IF NOT EXISTS {TABELA_TAREFAS} (
                     id_tarefa INTEGER PRIMARY KEY,
                     id_usuario INTEGER,
                     descricao TEXT NOT NULL,
@@ -22,7 +21,7 @@ class RepositorioTarefa(AuxiliarDB):
                     status TEXT NOT NULL,
                     criado_em TEXT NOT NULL,
                     finalizado_em TEXT,
-                    FOREIGN KEY (id_usuario) REFERENCES {self.__FOREIGN_TABELA} (id_usuario)
+                    FOREIGN KEY (id_usuario) REFERENCES {TABELA_USUARIOS} (id_usuario)
         )"""
 
         self.executar_sql(sql)
@@ -30,7 +29,7 @@ class RepositorioTarefa(AuxiliarDB):
 
     def adicionar_tarefa(self, tarefa: Tarefa) -> int:
 
-        sql = f"""INSERT INTO {self.__NOME_TABELA} (id_usuario, descricao, importancia, status, criado_em) VALUES(?,?,?,?,?)"""
+        sql = f"""INSERT INTO {TABELA_TAREFAS} (id_usuario, descricao, importancia, status, criado_em) VALUES(?,?,?,?,?)"""
 
         data = date.today().strftime("%d/%m/%Y")
         info_tarefa = (
@@ -47,8 +46,7 @@ class RepositorioTarefa(AuxiliarDB):
 
     def editar_tarefa(self, novos_dados: dict) -> int:
 
-        # trunk-ignore(bandit/B608)
-        sql = f"""UPDATE {self.__NOME_TABELA} SET descricao = ?, importancia = ? WHERE id_tarefa = ? AND status = 'A'"""
+        sql = f"""UPDATE {TABELA_TAREFAS} SET descricao = ?, importancia = ? WHERE id_tarefa = ? AND status = 'A'"""
 
         info_tarefa = (novos_dados['descricao'], novos_dados['importancia'], novos_dados['id_tarefa'])
         resultado = self.executar_sql(sql, info_tarefa, comitar=True).rowcount
@@ -59,8 +57,7 @@ class RepositorioTarefa(AuxiliarDB):
     def excluir_tarefa(self, tarefa: Tarefa) -> int:
 
         sql = (
-            # trunk-ignore(bandit/B608)
-            f"""DELETE FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A'"""
+            f"""DELETE FROM {TABELA_TAREFAS} WHERE id_tarefa = ? AND status = 'A'"""
         )
 
         resultado = self.executar_sql(sql, (tarefa.id_tarefa,), comitar=True).rowcount
@@ -70,8 +67,7 @@ class RepositorioTarefa(AuxiliarDB):
 
     def finalizar_tarefa(self, tarefa: Tarefa) -> int:
 
-        # trunk-ignore(bandit/B608)
-        sql = f"""UPDATE {self.__NOME_TABELA} SET status = 'F', finalizado_em = ? WHERE id_tarefa = ? AND status = 'A'"""
+        sql = f"""UPDATE {TABELA_TAREFAS} SET status = 'F', finalizado_em = ? WHERE id_tarefa = ? AND status = 'A'"""
 
         data = date.today().strftime("%d/%m/%Y")
         resultado = self.executar_sql(
@@ -83,8 +79,7 @@ class RepositorioTarefa(AuxiliarDB):
 
     def selecionar_todas_tarefas(self, id_usuario: int) -> list[Tarefa]:
 
-        # trunk-ignore(bandit/B608)
-        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {TABELA_TAREFAS} WHERE id_usuario = ? ORDER BY id_tarefa"""
 
         resultados = self.executar_sql(sql, (id_usuario,)).fetchall()
         self.fechar_conexao()
@@ -98,8 +93,7 @@ class RepositorioTarefa(AuxiliarDB):
     def selecionar_tarefa_por_id(self, id_tarefa: int, id_usuario: int) -> Tarefa:
         """retorna id_usuario, descricao, importancia, status"""
 
-        # trunk-ignore(bandit/B608)
-        sql = f"""SELECT id_usuario, descricao, importancia, status, id_tarefa FROM {self.__NOME_TABELA} WHERE id_tarefa = ? AND status = 'A' and id_usuario = ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_usuario, descricao, importancia, status, id_tarefa FROM {TABELA_TAREFAS} WHERE id_tarefa = ? AND status = 'A' and id_usuario = ? ORDER BY id_tarefa"""
 
         resultado = self.executar_sql(sql, (id_tarefa, id_usuario)).fetchone()
         self.fechar_conexao()
@@ -116,8 +110,7 @@ class RepositorioTarefa(AuxiliarDB):
     ) -> list[Tarefa]:
         """retorna id_tarefa, descricao, importancia"""
 
-        # trunk-ignore(bandit/B608)
-        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND status = ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {TABELA_TAREFAS} WHERE id_usuario = ? AND status = ? ORDER BY id_tarefa"""
 
         resultados = self.executar_sql(sql, (id_usuario, status)).fetchall()
         self.fechar_conexao()
@@ -133,8 +126,7 @@ class RepositorioTarefa(AuxiliarDB):
     ) -> list[Tarefa]:
         """retorna id_tarefa, descricao, importancia, status, criado_em, finalizado_em"""
 
-        # trunk-ignore(bandit/B608)
-        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND importancia = ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {TABELA_TAREFAS} WHERE id_usuario = ? AND importancia = ? ORDER BY id_tarefa"""
 
         resultados = self.executar_sql(sql, (id_usuario, importancia)).fetchall()
         self.fechar_conexao()
@@ -150,8 +142,7 @@ class RepositorioTarefa(AuxiliarDB):
     ) -> list[Tarefa]:
         """retorna id_tarefa, descricao, importancia, status, criado_em, finalizado_em"""
 
-        # trunk-ignore(bandit/B608)
-        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {self.__NOME_TABELA} WHERE id_usuario = ? AND {tipo_data} >= ? AND {tipo_data} <= ? ORDER BY id_tarefa"""
+        sql = f"""SELECT id_tarefa, descricao, importancia, status, criado_em, finalizado_em FROM {TABELA_TAREFAS} WHERE id_usuario = ? AND {tipo_data} >= ? AND {tipo_data} <= ? ORDER BY id_tarefa"""
 
         resultados = self.executar_sql(
             sql, (id_usuario, data_inicio, data_final)

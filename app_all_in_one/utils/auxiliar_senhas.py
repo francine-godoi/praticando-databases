@@ -6,13 +6,8 @@ from dotenv import load_dotenv
 
 
 def pegar_senha_tratada(salt: bytes, senha: str) -> bool | bytes:
-
     if not is_senha_forte(senha):
-        print(
-            "A senha deve conter pelo menos 8 caracteres, incluindo:\nletras maiúsculas, minúsculas, números e caracteres especiais\n"
-        )
         return False
-
     return hash_senha(salt, senha)
 
 

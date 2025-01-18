@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from utils.importador_classe_dinamico import model_tarefa as Tarefa
+from models.tarefas import Tarefa
 
 
 class TelaTarefas:

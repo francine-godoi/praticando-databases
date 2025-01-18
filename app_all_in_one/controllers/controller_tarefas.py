@@ -1,6 +1,6 @@
 from views.tela_tarefas import TelaTarefas
 
-from utils.importador_classe_dinamico import model_tarefa as Tarefa
+from models.tarefas import Tarefa
 from utils.importador_classe_dinamico import repo_tarefa as RepositorioTarefa
 
 

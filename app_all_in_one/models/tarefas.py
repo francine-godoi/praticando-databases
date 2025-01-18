@@ -1,11 +1,11 @@
-from sqlalchemy import ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from models.base import Base
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 
 class Tarefa(Base):
-
+    
     __tablename__ = "tarefas"
     
     id_tarefa: Mapped[int] = mapped_column(primary_key=True)
