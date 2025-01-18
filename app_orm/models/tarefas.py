@@ -1,13 +1,13 @@
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from repositories.conexao_db import ConexaoDb
 from datetime import datetime
+from models.base import Base
+from config import TABELA_TAREFAS
 
-Base = ConexaoDb().pegar_base()
 
 class Tarefa(Base):
 
-    __tablename__ = "tarefas"
+    __tablename__ = TABELA_TAREFAS
     
     id_tarefa: Mapped[int] = mapped_column(primary_key=True)
     descricao: Mapped[str] = mapped_column(nullable=False)

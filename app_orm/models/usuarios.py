@@ -1,12 +1,12 @@
 from typing import List
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from repositories.conexao_db import ConexaoDb
+from models.base import Base
+from config import TABELA_USUARIOS
 
-Base = ConexaoDb().pegar_base()
 
 class Usuario(Base):
 
-    __tablename__ = "usuarios"
+    __tablename__ = TABELA_USUARIOS
 
     id_usuario: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(nullable=False, unique=True)
@@ -24,4 +24,4 @@ class Usuario(Base):
         self.id_usuario = id_usuario
 
     def __repr__(self) -> str:
-        return f"Username: {self.username}, Senha: {self.senha}, Salt: {self.salt}"
+        return f"Orm = Username: {self.username}, Senha: {self.senha}, Salt: {self.salt}"

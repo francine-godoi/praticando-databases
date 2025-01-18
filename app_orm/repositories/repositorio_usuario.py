@@ -1,6 +1,7 @@
 from sqlalchemy.exc import IntegrityError
 from models.usuarios import Usuario
-from repositories.conexao_db import ConexaoDb
+from database.conexao_db import ConexaoDb
+from models.base import Base
 
 
 class RepositorioUsuario:    
@@ -11,7 +12,6 @@ class RepositorioUsuario:
         self.criar_tabela_usuario()
 
     def criar_tabela_usuario(self) -> None:
-        Base = self.conexao.pegar_base()
         Base.metadata.create_all(bind=self.conexao.db)
 
     def cadastrar_usuario(self, usuario: Usuario) -> int:

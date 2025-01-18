@@ -17,11 +17,17 @@ class ControllerUsuarios:
         if username == "" or senha == "":
             self.tela_usuario.mostrar_mensagem("Campos em branco.")
             return self.cadastrar_usuario()
+        
+        if self.existe_username(username):
+            self.tela_usuario.mostrar_mensagem("Esse usuário já está cadastrado.")
+            return
 
         # prepara a senha e pega o salt
         salt = gerar_salt()
         hashed_senha = pegar_senha_tratada(salt, senha)
         if not hashed_senha:
+            self.tela_usuario.mostrar_mensagem(
+            "A senha deve conter pelo menos 8 caracteres, incluindo:\nletras maiúsculas, minúsculas, números e caracteres especiais."        )
             return self.cadastrar_usuario()
 
         novo_usuario = Usuario(username, hashed_senha, salt)
@@ -52,3 +58,6 @@ class ControllerUsuarios:
         else:
             self.tela_usuario.mostrar_mensagem("Usuário ou Senha Inválidos.")
             return 0
+
+    def existe_username(self, username):
+        return self.repo_usuario.selecionar_usuario_por_username(username)
