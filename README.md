@@ -2,7 +2,7 @@
 
 ## 📋 Descrição
 
-Segundo mini projeto (via terminal) aplicando conceitos vistos durante minha jornada para aprender Python:
+Segundo projeto (via terminal) aplicando conceitos vistos durante minha jornada para aprender Python:
 
     1. Lógica de programação
     2. POO
